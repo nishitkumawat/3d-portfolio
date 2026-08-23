@@ -27,7 +27,7 @@ const Contact = () => {
             </p>
             <h4>Education</h4>
             <p>
-              LJ Institute of Engineering and Technology, Ahmedabad — 6th
+              LJ Institute of Engineering and Technology, Ahmedabad — 7th
               Semester Engineering
             </p>
           </div>
