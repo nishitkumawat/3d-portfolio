@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import "./styles/Work.css";
 import WorkImage from "./WorkImage";
-import { MdArrowBack, MdArrowForward } from "react-icons/md";
+import { MdArrowBack, MdArrowForward, MdArrowOutward } from "react-icons/md";
 
 const projects = [
   {
@@ -120,6 +120,17 @@ const Work = () => {
                           <span className="tools-label">Tools & Features</span>
                           <p>{project.tools}</p>
                         </div>
+                        {project.link && (
+                          <a
+                            href={project.link}
+                            target="_blank"
+                            rel="noreferrer"
+                            data-cursor="disable"
+                            className="carousel-visit-link"
+                          >
+                            Visit <MdArrowOutward />
+                          </a>
+                        )}
                       </div>
                     </div>
                     <div className="carousel-image-wrapper">
