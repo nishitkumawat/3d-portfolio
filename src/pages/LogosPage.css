@@ -1,0 +1,496 @@
+/* ── Full Portfolio Page ─────────────────────────────────────── */
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap");
+
+/* ── Base ── */
+.wp-page {
+  font-family: "Geist", sans-serif;
+  color: #eae5ec;
+  background-color: #0a0e17;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ══════════════════════════════════════════════════════
+   STICKY HEADER
+══════════════════════════════════════════════════════ */
+.wp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 6%;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  position: sticky;
+  top: 0;
+  background: rgba(10, 14, 23, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 100;
+}
+
+.wp-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "Geist", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #eae5ec;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 100px;
+  padding: 8px 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.wp-back-btn:hover {
+  background: rgba(94, 234, 212, 0.1);
+  border-color: #5eead4;
+  color: #5eead4;
+}
+
+.wp-brand {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.wp-label {
+  font-size: 13px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.5px;
+}
+
+/* ══════════════════════════════════════════════════════
+   SECTIONS WRAPPER
+══════════════════════════════════════════════════════ */
+.wp-section {
+  padding: 80px 0;
+}
+
+.wp-section--logos {
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.wp-section-inner {
+  width: 94%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ── Section Headings ── */
+.wp-eyebrow {
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: #5eead4;
+  margin: 0 0 12px;
+}
+
+.wp-section-heading h2 {
+  font-size: 70px;
+  font-weight: 500;
+  margin: 0 0 16px;
+  line-height: 1.05;
+}
+
+.wp-section-heading h2 span {
+  color: #5eead4;
+}
+
+.wp-section-sub {
+  font-size: 16px;
+  font-weight: 200;
+  color: #adacac;
+  margin: 0 0 40px;
+}
+
+/* ══════════════════════════════════════════════════════
+   WEBSITES GRID
+══════════════════════════════════════════════════════ */
+.wp-section-heading {
+  margin-bottom: 48px;
+}
+
+.wp-sites-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+
+/* ── Site Card ── */
+.wp-site-card {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.025);
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.wp-site-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(94, 234, 212, 0.3);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5), 0 0 50px rgba(94, 234, 212, 0.06);
+  color: inherit;
+}
+
+/* Glow blob */
+.wp-site-card__glow {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  top: -100px;
+  right: -100px;
+  background: radial-gradient(circle, rgba(94, 234, 212, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Screenshot */
+.wp-site-card__img-wrap {
+  position: relative;
+  width: 100%;
+  height: 240px;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.wp-site-card__img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  transition: transform 0.5s ease;
+}
+
+.wp-site-card:hover .wp-site-card__img-wrap img {
+  transform: scale(1.04);
+}
+
+/* Overlay visit icon */
+.wp-site-card__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 14, 23, 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.35s ease;
+}
+
+.wp-site-card:hover .wp-site-card__overlay {
+  background: rgba(10, 14, 23, 0.25);
+}
+
+.wp-site-card__visit-icon {
+  font-size: 32px;
+  color: #5eead4;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: all 0.3s ease;
+}
+
+.wp-site-card:hover .wp-site-card__visit-icon {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Body */
+.wp-site-card__body {
+  position: relative;
+  z-index: 1;
+  padding: 28px 30px 30px;
+}
+
+.wp-site-card__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.wp-site-card__title-row h3 {
+  font-size: 24px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.wp-site-card__arrow {
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.3);
+  transition: color 0.3s ease, transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.wp-site-card:hover .wp-site-card__arrow {
+  color: #5eead4;
+  transform: translate(2px, -2px);
+}
+
+.wp-site-card__category {
+  font-size: 13px;
+  font-weight: 300;
+  color: #5eead4;
+  margin: 0 0 12px;
+  letter-spacing: 0.3px;
+}
+
+.wp-site-card__desc {
+  font-size: 14px;
+  font-weight: 200;
+  color: #adacac;
+  line-height: 1.65;
+  margin: 0 0 18px;
+}
+
+.wp-site-card__tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.wp-tool-tag {
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 100px;
+  padding: 4px 12px;
+}
+
+/* ══════════════════════════════════════════════════════
+   LOGO SECTION
+══════════════════════════════════════════════════════ */
+
+/* Filter buttons */
+.wp-logo-filters {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 36px;
+}
+
+.wp-filter-btn {
+  font-family: "Geist", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 100px;
+  padding: 10px 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.wp-filter-btn:hover {
+  color: #eae5ec;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.wp-filter-btn--all.wp-filter-btn--active {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #eae5ec;
+}
+
+.wp-filter-btn--business.wp-filter-btn--active {
+  background: rgba(94, 234, 212, 0.1);
+  border-color: #5eead4;
+  color: #5eead4;
+}
+
+.wp-filter-btn--normal.wp-filter-btn--active {
+  background: rgba(167, 139, 250, 0.1);
+  border-color: #a78bfa;
+  color: #a78bfa;
+}
+
+/* ── Logo Grid — always 2 columns minimum, no labels ── */
+.wp-logo-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+/* ── Logo Tile — pure image, no text ── */
+.wp-logo-tile {
+  aspect-ratio: 1 / 1;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.03);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.3s ease, box-shadow 0.3s ease;
+  cursor: default;
+  position: relative;
+}
+
+.wp-logo-tile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.wp-logo-tile--business::before {
+  box-shadow: inset 0 0 0 1.5px rgba(94, 234, 212, 0.5);
+}
+
+.wp-logo-tile--normal::before {
+  box-shadow: inset 0 0 0 1.5px rgba(167, 139, 250, 0.5);
+}
+
+.wp-logo-tile:hover {
+  transform: scale(1.04);
+}
+
+.wp-logo-tile--business:hover {
+  border-color: rgba(94, 234, 212, 0.35);
+  box-shadow: 0 8px 30px rgba(94, 234, 212, 0.08);
+}
+
+.wp-logo-tile--business:hover::before {
+  opacity: 1;
+}
+
+.wp-logo-tile--normal:hover {
+  border-color: rgba(167, 139, 250, 0.35);
+  box-shadow: 0 8px 30px rgba(167, 139, 250, 0.08);
+}
+
+.wp-logo-tile--normal:hover::before {
+  opacity: 1;
+}
+
+.wp-logo-tile img {
+  max-width: 80%;
+  max-height: 80%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Empty state */
+.wp-empty {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.3);
+  font-weight: 200;
+  padding: 60px 0;
+  font-size: 16px;
+}
+
+/* ══════════════════════════════════════════════════════
+   FOOTER
+══════════════════════════════════════════════════════ */
+.wp-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 40px 6%;
+  text-align: center;
+}
+
+.wp-footer p {
+  font-size: 18px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+.wp-footer a {
+  color: #5eead4;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-bottom: 1px solid transparent;
+  transition: border-bottom-color 0.3s ease;
+}
+
+.wp-footer a:hover {
+  border-bottom-color: #5eead4;
+}
+
+/* ══════════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════════ */
+
+/* ── Large tablets / medium desktops ── */
+@media (max-width: 1100px) {
+  .wp-logo-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ── Tablets ── */
+@media (max-width: 900px) {
+  .wp-section {
+    padding: 60px 0;
+  }
+
+  .wp-section-heading h2 {
+    font-size: 46px;
+  }
+
+  .wp-sites-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Keep 2 columns for logos even on tablets */
+  .wp-logo-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+
+  .wp-site-card__img-wrap {
+    height: 200px;
+  }
+}
+
+/* ── Mobile ── */
+@media (max-width: 600px) {
+  .wp-section-heading h2 {
+    font-size: 36px;
+  }
+
+  .wp-label {
+    display: none;
+  }
+
+  .wp-header {
+    padding: 14px 4%;
+  }
+
+  .wp-section-inner {
+    width: 92%;
+  }
+
+  /* Always 2 columns on mobile too */
+  .wp-logo-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .wp-logo-tile {
+    border-radius: 10px;
+  }
+
+  .wp-site-card__body {
+    padding: 20px;
+  }
+
+  .wp-site-card__title-row h3 {
+    font-size: 20px;
+  }
+}

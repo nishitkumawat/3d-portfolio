@@ -1,7 +1,9 @@
 import { useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import "./styles/Work.css";
 import WorkImage from "./WorkImage";
 import { MdArrowBack, MdArrowForward, MdArrowOutward } from "react-icons/md";
+import logosData from "../data/logosData";
 
 const projects = [
   {
@@ -44,9 +46,13 @@ const projects = [
   },
 ];
 
+/* Show 3 logos as preview on the home page */
+const featuredLogos = logosData.slice(0, 3);
+
 const Work = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const navigate = useNavigate();
 
   const goToSlide = useCallback(
     (index: number) => {
@@ -73,6 +79,8 @@ const Work = () => {
   return (
     <div className="work-section" id="work">
       <div className="work-container section-container">
+
+        {/* ── Projects Carousel ─────────────────────────────── */}
         <h2>
           My <span>Work</span>
         </h2>
@@ -160,6 +168,53 @@ const Work = () => {
             ))}
           </div>
         </div>
+
+        {/* ── Logos Sub-section ─────────────────────────────── */}
+        <div className="logos-subsection" id="logos">
+          <div className="logos-sub-header">
+            <div>
+              <h2 className="logos-sub-title">
+                My <span>Logos</span>
+              </h2>
+              <p className="logos-sub-subtitle">
+                Brand identities crafted for businesses & personal concepts.
+              </p>
+            </div>
+            <div className="logos-type-legend">
+              <span className="legend-dot legend-dot--business" />
+              <span className="legend-label">Business</span>
+              <span className="legend-dot legend-dot--normal" />
+              <span className="legend-label">Personal</span>
+            </div>
+          </div>
+
+          {/* 3 preview cards — image only, no labels */}
+          <div className="logos-preview-grid">
+            {featuredLogos.map((logo) => (
+              <div
+                key={logo.id}
+                className={`logo-preview-card logo-preview-card--${logo.type}`}
+              >
+                <div className="logo-preview-img-wrap">
+                  <img src={logo.image} alt="" />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* View All Button */}
+          <div className="logos-cta">
+            <button
+              className="logos-view-all-btn"
+              data-cursor="disable"
+              onClick={() => navigate("/logos")}
+            >
+              <span>View My Work</span>
+              <MdArrowOutward />
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
   );
