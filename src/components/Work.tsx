@@ -44,6 +44,13 @@ const projects = [
     tools: "Django, Bootstrap, PostgreSQL, Inventory & Billing",
     image: "/images/fintrack.png",
   },
+  {
+    title: "SGI ERP",
+    category: "Enterprise Resource Planning System",
+    tools: "HTML, CSS, JavaScript, Bootstrap Icons, Multi-module ERP",
+    image: "/images/sgierp.png",
+    link: "/SGIERP-Demo.html",
+  },
 ];
 
 /* Show 3 logos as preview on the home page */

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import logosData from "../data/logosData";
 import { MdArrowBack, MdArrowOutward } from "react-icons/md";
 import "./LogosPage.css";
@@ -33,10 +33,24 @@ const websites = [
     image: "/images/shreegayatri.png",
     link: "https://www.shreegayatri-industries.com/",
   },
+  {
+    title: "SGI ERP",
+    category: "Enterprise Resource Planning System",
+    description:
+      "A comprehensive ERP demo for Shree Gayatri Industries featuring multi-module management: Dashboard, Inventory, Production Planning, Dispatch, HR, Quality Control, and Settings — built with a clean orange-dark sidebar UI.",
+    tools: ["HTML", "CSS", "JavaScript", "Bootstrap Icons", "ERP", "Multi-module"],
+    image: "/images/sgierp.png",
+    link: "/SGIERP-Demo.html",
+  },
 ];
 
 const LogosPage = () => {
   const [logoFilter, setLogoFilter] = useState<LogoFilter>("all");
+
+  useEffect(() => {
+    document.body.style.overflowY = "auto";
+    window.scrollTo(0, 0);
+  }, []);
 
   const filteredLogos =
     logoFilter === "all"

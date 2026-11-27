@@ -28,9 +28,10 @@ const Navbar = () => {
       let element = elem as HTMLAnchorElement;
       element.addEventListener("click", (e) => {
         if (window.innerWidth > 1024) {
+          let el = e.currentTarget as HTMLAnchorElement;
+          let section = el.getAttribute("data-href");
+          if (!section) return; // let normal page-navigation links work
           e.preventDefault();
-          let elem = e.currentTarget as HTMLAnchorElement;
-          let section = elem.getAttribute("data-href");
           smoother.scrollTo(section, true, "top top");
         }
       });
@@ -61,7 +62,7 @@ const Navbar = () => {
             </a>
           </li>
           <li>
-            <a data-href="#work" href="#work">
+            <a href="/logos" data-cursor="disable">
               <HoverLinks text="WORK" />
             </a>
           </li>

@@ -1,0 +1,2314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SGI ERP - Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<style>
+:root {
+  --sgi-primary: #E65100;
+  --sgi-primary-light: #FF6D00;
+  --sgi-primary-dark: #BF360C;
+  --sgi-sidebar-bg: #1A2332;
+  --sgi-sidebar-width: 240px;
+  --sgi-sidebar-collapsed: 64px;
+  --sgi-topbar-height: 60px;
+  --sgi-text: #2D3748;
+  --sgi-text-muted: #718096;
+  --sgi-border: #E2E8F0;
+  --sgi-bg: #F7FAFC;
+  --sgi-white: #FFFFFF;
+  --sgi-success: #2E7D32;
+  --sgi-danger: #C62828;
+  --sgi-warning: #F57F17;
+  --sgi-info: #01579B;
+  --sgi-card-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  --sgi-radius: 8px;
+  --sgi-transition: all 0.2s ease;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--sgi-bg);
+  color: var(--sgi-text);
+  display: flex;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===================== SIDEBAR ===================== */
+.sgi-sidebar {
+  width: var(--sgi-sidebar-width);
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.85) 100%), #1A2332;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 1000;
+  transition: width 0.25s ease;
+  overflow: hidden;
+}
+.sgi-sidebar.collapsed { width: var(--sgi-sidebar-collapsed); }
+.sgi-sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  min-height: var(--sgi-topbar-height);
+  text-decoration: none;
+  cursor: pointer;
+}
+.sgi-logo-icon {
+  width: 36px; height: 36px;
+  background: var(--sgi-primary);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 15px; color: #fff;
+  flex-shrink: 0;
+}
+.sgi-logo-text {
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  white-space: nowrap;
+  opacity: 1;
+  transition: opacity 0.2s;
+}
+.sgi-sidebar.collapsed .sgi-logo-text { opacity: 0; pointer-events: none; }
+.sgi-sidebar.collapsed .sidebar-section-label { opacity: 0; }
+
+.sgi-sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+.sidebar-section-label {
+  color: rgba(255,255,255,0.4);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 14px 20px 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: opacity 0.2s;
+}
+.sgi-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  color: rgba(255,255,255,0.65);
+  cursor: pointer;
+  transition: var(--sgi-transition);
+  border-radius: 0;
+  white-space: nowrap;
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  position: relative;
+}
+.sgi-nav-item:hover { color: #fff; background: rgba(255,255,255,0.07); }
+.sgi-nav-item.active { color: #fff; background: rgba(230, 81, 0, 0.3); }
+.sgi-nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--sgi-primary);
+  border-radius: 0 2px 2px 0;
+}
+.sgi-nav-item i { font-size: 18px; flex-shrink: 0; min-width: 24px; text-align: center; }
+.sgi-nav-label { opacity: 1; transition: opacity 0.2s; }
+.sgi-sidebar.collapsed .sgi-nav-label { opacity: 0; pointer-events: none; }
+.sgi-sidebar.collapsed .sgi-nav-item { padding: 10px; justify-content: center; }
+
+/* ===================== TOPBAR ===================== */
+.sgi-topbar {
+  height: var(--sgi-topbar-height);
+  background: var(--sgi-white);
+  border-bottom: 1px solid var(--sgi-border);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 12px;
+  position: fixed;
+  top: 0;
+  left: var(--sgi-sidebar-width);
+  right: 0;
+  z-index: 999;
+  transition: left 0.25s ease;
+}
+.sgi-topbar.sidebar-collapsed { left: var(--sgi-sidebar-collapsed); }
+.sgi-topbar-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--sgi-text-muted);
+  font-size: 20px;
+  padding: 6px;
+  border-radius: 6px;
+  display: flex; align-items: center;
+  transition: var(--sgi-transition);
+}
+.sgi-topbar-toggle:hover { background: var(--sgi-bg); color: var(--sgi-text); }
+.sgi-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--sgi-text-muted);
+  flex: 1;
+}
+.sgi-breadcrumb-current { color: var(--sgi-text); font-weight: 600; }
+.sgi-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sgi-topbar-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: var(--sgi-transition);
+  text-decoration: none;
+}
+.sgi-topbar-btn-primary { background: var(--sgi-primary); color: #fff; }
+.sgi-topbar-btn-primary:hover { background: var(--sgi-primary-dark); }
+.sgi-topbar-btn-outline { background: transparent; border: 1.5px solid var(--sgi-border); color: var(--sgi-text); }
+.sgi-topbar-btn-outline:hover { background: var(--sgi-bg); }
+.sgi-avatar {
+  width: 34px; height: 34px;
+  background: var(--sgi-primary);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  position: relative;
+}
+.sgi-user-dropdown {
+  position: absolute;
+  top: 46px; right: 0;
+  background: #fff;
+  border: 1px solid var(--sgi-border);
+  border-radius: 8px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+  min-width: 180px;
+  z-index: 2000;
+  display: none;
+  overflow: hidden;
+}
+.sgi-user-dropdown.show { display: block; }
+.sgi-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  font-size: 13px;
+  color: var(--sgi-text);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.sgi-dropdown-item:hover { background: var(--sgi-bg); }
+.sgi-dropdown-item i { font-size: 16px; color: var(--sgi-text-muted); }
+.sgi-dropdown-divider { border-top: 1px solid var(--sgi-border); margin: 4px 0; }
+
+/* ===================== MAIN CONTENT ===================== */
+.sgi-main {
+  margin-left: var(--sgi-sidebar-width);
+  margin-top: var(--sgi-topbar-height);
+  flex: 1;
+  transition: margin-left 0.25s ease;
+  min-height: calc(100vh - var(--sgi-topbar-height));
+}
+.sgi-main.sidebar-collapsed { margin-left: var(--sgi-sidebar-collapsed); }
+.sgi-page {
+  display: none;
+  padding: 24px;
+  animation: fadeIn 0.2s ease;
+}
+.sgi-page.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ===================== PAGE HEADER ===================== */
+.sgi-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.sgi-page-title { font-size: 20px; font-weight: 700; color: var(--sgi-text); }
+.sgi-page-subtitle { font-size: 13px; color: var(--sgi-text-muted); margin-top: 2px; }
+.sgi-page-actions { display: flex; gap: 8px; align-items: center; }
+
+/* ===================== CARDS ===================== */
+.sgi-card {
+  background: var(--sgi-white);
+  border-radius: var(--sgi-radius);
+  box-shadow: var(--sgi-card-shadow);
+  border: 1px solid var(--sgi-border);
+  overflow: hidden;
+}
+.sgi-card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--sgi-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.sgi-card-title { font-size: 15px; font-weight: 600; }
+.sgi-card-body { padding: 20px; }
+
+/* ===================== STAT CARDS ===================== */
+.sgi-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.sgi-stat-card {
+  background: var(--sgi-white);
+  border-radius: var(--sgi-radius);
+  box-shadow: var(--sgi-card-shadow);
+  border: 1px solid var(--sgi-border);
+  padding: 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+.sgi-stat-icon {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.sgi-stat-icon.orange { background: rgba(230,81,0,0.1); color: var(--sgi-primary); }
+.sgi-stat-icon.green { background: rgba(46,125,50,0.1); color: var(--sgi-success); }
+.sgi-stat-icon.blue { background: rgba(1,87,155,0.1); color: var(--sgi-info); }
+.sgi-stat-icon.red { background: rgba(198,40,40,0.1); color: var(--sgi-danger); }
+.sgi-stat-icon.purple { background: rgba(106,27,154,0.1); color: #6A1B9A; }
+.sgi-stat-value { font-size: 26px; font-weight: 700; line-height: 1; }
+.sgi-stat-label { font-size: 12px; color: var(--sgi-text-muted); margin-top: 4px; }
+.sgi-stat-change { font-size: 11px; margin-top: 6px; }
+.sgi-stat-change.up { color: var(--sgi-success); }
+.sgi-stat-change.down { color: var(--sgi-danger); }
+
+/* ===================== BUTTONS ===================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: var(--sgi-transition);
+  text-decoration: none;
+}
+.btn-primary { background: var(--sgi-primary); color: #fff; }
+.btn-primary:hover { background: var(--sgi-primary-dark); }
+.btn-outline { background: transparent; border: 1.5px solid var(--sgi-border); color: var(--sgi-text); }
+.btn-outline:hover { background: var(--sgi-bg); }
+.btn-success { background: var(--sgi-success); color: #fff; }
+.btn-success:hover { background: #1b5e20; }
+.btn-danger { background: var(--sgi-danger); color: #fff; }
+.btn-danger:hover { background: #7f0000; }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+.btn-icon { padding: 7px; }
+
+/* ===================== BADGE ===================== */
+.sgi-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+.sgi-badge-orange { background: rgba(230,81,0,0.12); color: var(--sgi-primary); }
+.sgi-badge-green { background: rgba(46,125,50,0.12); color: var(--sgi-success); }
+.sgi-badge-blue { background: rgba(1,87,155,0.12); color: var(--sgi-info); }
+.sgi-badge-red { background: rgba(198,40,40,0.12); color: var(--sgi-danger); }
+.sgi-badge-grey { background: rgba(113,128,150,0.12); color: var(--sgi-text-muted); }
+.sgi-badge-purple { background: rgba(106,27,154,0.12); color: #6A1B9A; }
+.sgi-badge-yellow { background: rgba(245,127,23,0.12); color: var(--sgi-warning); }
+
+/* ===================== FILTER BAR ===================== */
+.sgi-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.sgi-search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+  max-width: 320px;
+}
+.sgi-search-wrap i {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--sgi-text-muted);
+  font-size: 15px;
+}
+.sgi-search-input {
+  width: 100%;
+  padding: 8px 12px 8px 34px;
+  border: 1.5px solid var(--sgi-border);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--sgi-text);
+  background: var(--sgi-white);
+  transition: border-color 0.15s;
+  outline: none;
+}
+.sgi-search-input:focus { border-color: var(--sgi-primary); }
+.sgi-filter-select {
+  padding: 8px 12px;
+  border: 1.5px solid var(--sgi-border);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--sgi-text);
+  background: var(--sgi-white);
+  cursor: pointer;
+  outline: none;
+}
+.sgi-filter-select:focus { border-color: var(--sgi-primary); }
+
+/* ===================== TABLE ===================== */
+.sgi-table-wrap {
+  overflow-x: auto;
+  border-radius: var(--sgi-radius);
+  border: 1px solid var(--sgi-border);
+  background: var(--sgi-white);
+}
+.sgi-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.sgi-table thead th {
+  padding: 11px 14px;
+  background: #F8FAFC;
+  color: var(--sgi-text-muted);
+  font-weight: 600;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--sgi-border);
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+}
+.sgi-table tbody tr {
+  border-bottom: 1px solid var(--sgi-border);
+  transition: background 0.1s;
+}
+.sgi-table tbody tr:last-child { border-bottom: none; }
+.sgi-table tbody tr:hover { background: #FAFBFC; }
+.sgi-table tbody td { padding: 11px 14px; vertical-align: middle; }
+.sgi-table .item-img {
+  width: 36px; height: 36px;
+  border-radius: 6px;
+  background: var(--sgi-bg);
+  border: 1px solid var(--sgi-border);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--sgi-text-muted);
+  font-size: 16px;
+}
+.sgi-table .item-code { font-weight: 600; color: var(--sgi-primary); font-size: 12px; }
+.sgi-table .item-name { font-weight: 500; }
+.sgi-table .text-muted { color: var(--sgi-text-muted); font-size: 12px; }
+.sgi-table .qty-cell { font-weight: 700; font-size: 15px; }
+.td-actions { display: flex; gap: 6px; }
+
+/* ===================== FORMS ===================== */
+.sgi-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+.sgi-form-group { display: flex; flex-direction: column; gap: 6px; }
+.sgi-form-label { font-size: 12.5px; font-weight: 600; color: var(--sgi-text); }
+.sgi-form-label span { color: var(--sgi-danger); }
+.sgi-form-control {
+  padding: 9px 12px;
+  border: 1.5px solid var(--sgi-border);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--sgi-text);
+  background: var(--sgi-white);
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+.sgi-form-control:focus { border-color: var(--sgi-primary); }
+.sgi-form-control::placeholder { color: var(--sgi-text-muted); }
+select.sgi-form-control { cursor: pointer; }
+textarea.sgi-form-control { resize: vertical; min-height: 80px; }
+.sgi-form-hint { font-size: 11.5px; color: var(--sgi-text-muted); }
+.sgi-form-actions { display: flex; gap: 10px; justify-content: flex-end; padding-top: 8px; border-top: 1px solid var(--sgi-border); margin-top: 8px; }
+
+/* ===================== PROCESS TIMELINE ===================== */
+.process-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+.process-step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--sgi-bg);
+  border: 1.5px solid var(--sgi-border);
+  color: var(--sgi-text-muted);
+  white-space: nowrap;
+  position: relative;
+  cursor: default;
+}
+.process-step.active { background: rgba(230,81,0,0.1); border-color: var(--sgi-primary); color: var(--sgi-primary); }
+.process-step.done { background: rgba(46,125,50,0.1); border-color: var(--sgi-success); color: var(--sgi-success); }
+.process-arrow { font-size: 14px; color: var(--sgi-border); margin: 0 2px; }
+
+/* ===================== PROGRESS BARS ===================== */
+.sgi-progress { background: var(--sgi-bg); border-radius: 20px; height: 8px; overflow: hidden; }
+.sgi-progress-bar { height: 100%; border-radius: 20px; background: var(--sgi-primary); transition: width 0.4s ease; }
+.sgi-progress-bar.green { background: var(--sgi-success); }
+.sgi-progress-bar.blue { background: var(--sgi-info); }
+.sgi-progress-bar.purple { background: #6A1B9A; }
+
+/* ===================== TABS ===================== */
+.sgi-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid var(--sgi-border);
+  margin-bottom: 20px;
+}
+.sgi-tab {
+  padding: 9px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--sgi-text-muted);
+  cursor: pointer;
+  border-radius: 6px 6px 0 0;
+  border: none;
+  background: none;
+  transition: var(--sgi-transition);
+  margin-bottom: -2px;
+  border-bottom: 2px solid transparent;
+}
+.sgi-tab:hover { color: var(--sgi-text); background: var(--sgi-bg); }
+.sgi-tab.active { color: var(--sgi-primary); border-bottom-color: var(--sgi-primary); font-weight: 600; }
+.sgi-tab-content { display: none; }
+.sgi-tab-content.active { display: block; }
+
+/* ===================== PLANNING CARDS ===================== */
+.sgi-plan-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.sgi-plan-card {
+  background: var(--sgi-white);
+  border: 1px solid var(--sgi-border);
+  border-radius: var(--sgi-radius);
+  overflow: hidden;
+  box-shadow: var(--sgi-card-shadow);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.sgi-plan-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.sgi-plan-card-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--sgi-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sgi-plan-card-body { padding: 14px 16px; }
+.sgi-plan-card-footer {
+  padding: 10px 16px;
+  border-top: 1px solid var(--sgi-border);
+  background: var(--sgi-bg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sgi-step-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.sgi-step-chip {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--sgi-bg);
+  border: 1px solid var(--sgi-border);
+  color: var(--sgi-text-muted);
+}
+.sgi-step-chip.active { background: rgba(230,81,0,0.1); border-color: var(--sgi-primary); color: var(--sgi-primary); }
+
+/* ===================== TAG ===================== */
+.sgi-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  background: rgba(1,87,155,0.08);
+  color: var(--sgi-info);
+  border: 1px solid rgba(1,87,155,0.2);
+}
+
+/* ===================== TOAST ===================== */
+.sgi-toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sgi-toast {
+  min-width: 260px;
+  max-width: 380px;
+  padding: 14px 18px;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13.5px;
+  font-weight: 500;
+  animation: toastIn 0.25s ease;
+}
+@keyframes toastIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+.sgi-toast.success { background: #fff; border-left: 4px solid var(--sgi-success); color: var(--sgi-text); }
+.sgi-toast.error { background: #fff; border-left: 4px solid var(--sgi-danger); color: var(--sgi-text); }
+.sgi-toast.info { background: #fff; border-left: 4px solid var(--sgi-info); color: var(--sgi-text); }
+.sgi-toast i { font-size: 18px; }
+.sgi-toast.success i { color: var(--sgi-success); }
+.sgi-toast.error i { color: var(--sgi-danger); }
+.sgi-toast.info i { color: var(--sgi-info); }
+
+/* ===================== MODAL ===================== */
+.sgi-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.15s ease;
+}
+.sgi-modal {
+  background: var(--sgi-white);
+  border-radius: 10px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  width: 90%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.sgi-modal-header {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--sgi-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sgi-modal-title { font-size: 16px; font-weight: 700; }
+.sgi-modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--sgi-text-muted); padding: 2px; }
+.sgi-modal-body { padding: 20px; }
+.sgi-modal-footer { padding: 14px 20px; border-top: 1px solid var(--sgi-border); display: flex; gap: 10px; justify-content: flex-end; }
+
+/* ===================== DASHBOARD GRID ===================== */
+.sgi-dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 1100px) { .sgi-dashboard-grid { grid-template-columns: 1fr; } }
+
+/* ===================== UTILITY ===================== */
+.d-flex { display: flex; }
+.align-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-8 { gap: 8px; }
+.gap-12 { gap: 12px; }
+.mt-16 { margin-top: 16px; }
+.mb-16 { margin-bottom: 16px; }
+.mb-20 { margin-bottom: 20px; }
+.text-muted { color: var(--sgi-text-muted); }
+.text-sm { font-size: 12px; }
+.fw-600 { font-weight: 600; }
+.fw-700 { font-weight: 700; }
+
+/* ===================== PROCESS LIST ITEM ===================== */
+.sgi-process-row {
+  display: flex;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--sgi-border);
+  gap: 14px;
+}
+.sgi-process-row:last-child { border-bottom: none; }
+.sgi-process-name { font-weight: 600; min-width: 120px; }
+.sgi-process-bar-wrap { flex: 1; }
+.sgi-process-count { font-weight: 700; min-width: 40px; text-align: right; color: var(--sgi-primary); }
+
+/* ===================== HISTORY ENTRY ===================== */
+.sgi-history-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--sgi-border);
+}
+.sgi-history-item:last-child { border-bottom: none; }
+.sgi-history-icon {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.sgi-history-time { font-size: 11.5px; color: var(--sgi-text-muted); }
+
+/* ===================== EMPTY STATE ===================== */
+.sgi-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: var(--sgi-text-muted);
+  text-align: center;
+  gap: 12px;
+}
+.sgi-empty i { font-size: 48px; opacity: 0.3; }
+.sgi-empty p { font-size: 14px; }
+
+/* ===================== ASSIGNEE CHIP ===================== */
+.sgi-assignee { display: flex; align-items: center; gap: 7px; }
+.sgi-assignee-avatar {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--sgi-primary);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.sgi-assignee-name { font-size: 13px; font-weight: 500; }
+.sgi-phone-link { font-size: 11.5px; color: var(--sgi-info); text-decoration: none; display: flex; align-items: center; gap: 3px; }
+.sgi-phone-link:hover { text-decoration: underline; }
+
+/* ===================== DISPATCH CARD ===================== */
+.sgi-dispatch-card {
+  background: var(--sgi-white);
+  border: 1px solid var(--sgi-border);
+  border-radius: var(--sgi-radius);
+  padding: 16px 20px;
+  box-shadow: var(--sgi-card-shadow);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.sgi-dispatch-icon {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  background: rgba(230,81,0,0.1);
+  color: var(--sgi-primary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.sgi-dispatch-info { flex: 1; }
+.sgi-dispatch-name { font-weight: 600; font-size: 14px; }
+.sgi-dispatch-meta { font-size: 12px; color: var(--sgi-text-muted); margin-top: 2px; }
+.sgi-dispatch-qty { font-size: 20px; font-weight: 800; color: var(--sgi-primary); }
+
+/* ===================== SETTINGS ===================== */
+.sgi-settings-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-right: 1px solid var(--sgi-border);
+  padding-right: 16px;
+  min-width: 180px;
+}
+.sgi-settings-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--sgi-text-muted);
+  cursor: pointer;
+  transition: var(--sgi-transition);
+}
+.sgi-settings-nav-item:hover { background: var(--sgi-bg); color: var(--sgi-text); }
+.sgi-settings-nav-item.active { background: rgba(230,81,0,0.08); color: var(--sgi-primary); font-weight: 600; }
+.sgi-settings-layout { display: flex; gap: 24px; }
+.sgi-settings-content { flex: 1; }
+
+/* Demo banner */
+.demo-banner {
+  background: linear-gradient(90deg, var(--sgi-primary), #FF6D00);
+  color: #fff;
+  text-align: center;
+  padding: 7px 20px;
+  font-size: 12.5px;
+  font-weight: 500;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 10000;
+}
+body { padding-top: 32px; }
+.sgi-topbar { top: 32px; }
+.sgi-sidebar { top: 32px; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sgi-sidebar { transform: translateX(-100%); width: var(--sgi-sidebar-width) !important; }
+  .sgi-sidebar.mobile-open { transform: translateX(0); }
+  .sgi-main { margin-left: 0 !important; }
+  .sgi-topbar { left: 0 !important; }
+  .sgi-stats-grid { grid-template-columns: 1fr 1fr; }
+  .sgi-form-grid { grid-template-columns: 1fr; }
+  .sgi-dashboard-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- Demo Banner -->
+<div class="demo-banner">
+  <i class="bi bi-stars"></i>&nbsp; <strong>DEMO MODE</strong> — All data is sample/dummy data for showcase purposes only
+</div>
+
+<!-- Toast Container -->
+<div class="sgi-toast-container" id="toastContainer"></div>
+
+<!-- ===================== SIDEBAR ===================== -->
+<aside class="sgi-sidebar" id="sidebar">
+  <div class="sgi-sidebar-logo" onclick="showPage('dashboard')">
+    <div class="sgi-logo-icon">SGI</div>
+    <span class="sgi-logo-text">SGI ERP</span>
+  </div>
+  <nav class="sgi-sidebar-nav">
+    <div class="sgi-nav-item active" id="nav-dashboard" onclick="showPage('dashboard')">
+      <i class="bi bi-grid-1x2-fill"></i>
+      <span class="sgi-nav-label">Dashboard</span>
+    </div>
+    <div class="sidebar-section-label">INVENTORY</div>
+    <div class="sgi-nav-item" id="nav-catalog" onclick="showPage('catalog')">
+      <i class="bi bi-box-seam"></i>
+      <span class="sgi-nav-label">Item Catalog</span>
+    </div>
+    <div class="sgi-nav-item" id="nav-inventory" onclick="showPage('inventory')">
+      <i class="bi bi-clipboard2-data"></i>
+      <span class="sgi-nav-label">Inventory</span>
+    </div>
+    <div class="sgi-nav-item" id="nav-add-stock" onclick="showPage('add-stock')">
+      <i class="bi bi-plus-circle"></i>
+      <span class="sgi-nav-label">Add Stock</span>
+    </div>
+    <div class="sgi-nav-item" id="nav-move-stock" onclick="showPage('move-stock')">
+      <i class="bi bi-arrow-left-right"></i>
+      <span class="sgi-nav-label">Move Stock</span>
+    </div>
+    <div class="sgi-nav-item" id="nav-history" onclick="showPage('history')">
+      <i class="bi bi-clock-history"></i>
+      <span class="sgi-nav-label">Stock History</span>
+    </div>
+    <div class="sgi-nav-item" id="nav-completed" onclick="showPage('completed')">
+      <i class="bi bi-check2-circle"></i>
+      <span class="sgi-nav-label">Completed Stock</span>
+    </div>
+    <div class="sgi-nav-item" id="nav-by-process" onclick="showPage('by-process')">
+      <i class="bi bi-diagram-3"></i>
+      <span class="sgi-nav-label">Stock by Process</span>
+    </div>
+    <div class="sgi-nav-item" id="nav-by-assignee" onclick="showPage('by-assignee')">
+      <i class="bi bi-people"></i>
+      <span class="sgi-nav-label">Stock by Assignee</span>
+    </div>
+    <div class="sidebar-section-label">PRODUCTION</div>
+    <div class="sgi-nav-item" id="nav-products" onclick="showPage('products')">
+      <i class="bi bi-gear"></i>
+      <span class="sgi-nav-label">Products</span>
+    </div>
+    <div class="sgi-nav-item" id="nav-planning" onclick="showPage('planning')">
+      <i class="bi bi-kanban"></i>
+      <span class="sgi-nav-label">Planning</span>
+    </div>
+    <div class="sgi-nav-item" id="nav-dispatch" onclick="showPage('dispatch')">
+      <i class="bi bi-truck"></i>
+      <span class="sgi-nav-label">Dispatch</span>
+    </div>
+    <div class="sidebar-section-label">ADMIN</div>
+    <div class="sgi-nav-item" id="nav-settings" onclick="showPage('settings')">
+      <i class="bi bi-sliders2"></i>
+      <span class="sgi-nav-label">Settings</span>
+    </div>
+  </nav>
+</aside>
+
+<!-- ===================== TOPBAR ===================== -->
+<header class="sgi-topbar" id="topbar">
+  <button class="sgi-topbar-toggle" onclick="toggleSidebar()">
+    <i class="bi bi-list"></i>
+  </button>
+  <div class="sgi-breadcrumb">
+    <span>SGI ERP</span>
+    <i class="bi bi-chevron-right" style="font-size:11px"></i>
+    <span class="sgi-breadcrumb-current" id="breadcrumbCurrent">Dashboard</span>
+  </div>
+  <div class="sgi-topbar-actions">
+    <button class="sgi-topbar-btn sgi-topbar-btn-outline" onclick="showPage('add-stock')">
+      <i class="bi bi-plus-lg"></i> Add Stock
+    </button>
+    <button class="sgi-topbar-btn sgi-topbar-btn-outline" onclick="showPage('move-stock')">
+      <i class="bi bi-arrow-left-right"></i> Move Stock
+    </button>
+    <div style="position:relative">
+      <div class="sgi-avatar" id="userAvatarBtn" onclick="toggleUserDropdown()">PK</div>
+      <div class="sgi-user-dropdown" id="userDropdown">
+        <div class="sgi-dropdown-item" style="border-bottom:1px solid var(--sgi-border); padding-bottom:12px; margin-bottom:4px;">
+          <div>
+            <div style="font-weight:600">Pravin Kumar</div>
+            <div style="font-size:11px;color:var(--sgi-text-muted)">pravin@sgi.com</div>
+          </div>
+        </div>
+        <div class="sgi-dropdown-item" onclick="showPage('settings')"><i class="bi bi-person"></i> Profile</div>
+        <div class="sgi-dropdown-item" onclick="showPage('settings')"><i class="bi bi-sliders2"></i> Settings</div>
+        <div class="sgi-dropdown-divider"></div>
+        <div class="sgi-dropdown-item" style="color:var(--sgi-danger)"><i class="bi bi-box-arrow-right"></i> Sign Out</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== MAIN ===================== -->
+<main class="sgi-main" id="mainContent">
+
+<!-- ============ PAGE: DASHBOARD ============ -->
+<section class="sgi-page active" id="page-dashboard">
+  <div class="sgi-page-header">
+    <div>
+      <div class="sgi-page-title">Dashboard</div>
+      <div class="sgi-page-subtitle">Welcome back, Pravin! Here's what's happening today.</div>
+    </div>
+    <div class="sgi-page-actions">
+      <span class="text-muted text-sm">Last updated: 27 Nov 2026, 09:14 AM</span>
+    </div>
+  </div>
+
+  <!-- Stat Cards -->
+  <div class="sgi-stats-grid">
+    <div class="sgi-stat-card">
+      <div class="sgi-stat-icon orange"><i class="bi bi-box-seam"></i></div>
+      <div>
+        <div class="sgi-stat-value">8</div>
+        <div class="sgi-stat-label">Total Items</div>
+        <div class="sgi-stat-change up"><i class="bi bi-arrow-up-short"></i> 2 added this month</div>
+      </div>
+    </div>
+    <div class="sgi-stat-card">
+      <div class="sgi-stat-icon blue"><i class="bi bi-clipboard2-data"></i></div>
+      <div>
+        <div class="sgi-stat-value">23</div>
+        <div class="sgi-stat-label">Active Entries</div>
+        <div class="sgi-stat-change up"><i class="bi bi-arrow-up-short"></i> 5 since yesterday</div>
+      </div>
+    </div>
+    <div class="sgi-stat-card">
+      <div class="sgi-stat-icon green"><i class="bi bi-check2-all"></i></div>
+      <div>
+        <div class="sgi-stat-value">342</div>
+        <div class="sgi-stat-label">Completed Units</div>
+        <div class="sgi-stat-change up"><i class="bi bi-arrow-up-short"></i> 48 today</div>
+      </div>
+    </div>
+    <div class="sgi-stat-card">
+      <div class="sgi-stat-icon purple"><i class="bi bi-gear"></i></div>
+      <div>
+        <div class="sgi-stat-value">4</div>
+        <div class="sgi-stat-label">Products</div>
+        <div class="sgi-stat-change" style="color:var(--sgi-text-muted)">All active</div>
+      </div>
+    </div>
+    <div class="sgi-stat-card">
+      <div class="sgi-stat-icon orange"><i class="bi bi-truck"></i></div>
+      <div>
+        <div class="sgi-stat-value">1</div>
+        <div class="sgi-stat-label">Dispatches Today</div>
+        <div class="sgi-stat-change" style="color:var(--sgi-text-muted)">50 pcs to Jaipur</div>
+      </div>
+    </div>
+    <div class="sgi-stat-card">
+      <div class="sgi-stat-icon red"><i class="bi bi-exclamation-triangle"></i></div>
+      <div>
+        <div class="sgi-stat-value">3</div>
+        <div class="sgi-stat-label">Low Stock Alerts</div>
+        <div class="sgi-stat-change down"><i class="bi bi-arrow-down-short"></i> Needs reorder</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sgi-dashboard-grid">
+    <!-- Process Distribution -->
+    <div class="sgi-card">
+      <div class="sgi-card-header">
+        <div class="sgi-card-title"><i class="bi bi-diagram-3" style="color:var(--sgi-primary)"></i> Stock by Process</div>
+        <button class="btn btn-sm btn-outline" onclick="showPage('by-process')">View All</button>
+      </div>
+      <div class="sgi-card-body">
+        <div class="sgi-process-row">
+          <div class="sgi-process-name">Incoming</div>
+          <div class="sgi-process-bar-wrap">
+            <div class="sgi-progress"><div class="sgi-progress-bar" style="width:85%"></div></div>
+          </div>
+          <div class="sgi-process-count">85</div>
+        </div>
+        <div class="sgi-process-row">
+          <div class="sgi-process-name">Turning</div>
+          <div class="sgi-process-bar-wrap">
+            <div class="sgi-progress"><div class="sgi-progress-bar blue" style="width:62%"></div></div>
+          </div>
+          <div class="sgi-process-count">62</div>
+        </div>
+        <div class="sgi-process-row">
+          <div class="sgi-process-name">Drilling</div>
+          <div class="sgi-process-bar-wrap">
+            <div class="sgi-progress"><div class="sgi-progress-bar" style="width:47%"></div></div>
+          </div>
+          <div class="sgi-process-count">47</div>
+        </div>
+        <div class="sgi-process-row">
+          <div class="sgi-process-name">Finishing</div>
+          <div class="sgi-process-bar-wrap">
+            <div class="sgi-progress"><div class="sgi-progress-bar purple" style="width:38%"></div></div>
+          </div>
+          <div class="sgi-process-count">38</div>
+        </div>
+        <div class="sgi-process-row">
+          <div class="sgi-process-name">QC</div>
+          <div class="sgi-process-bar-wrap">
+            <div class="sgi-progress"><div class="sgi-progress-bar green" style="width:28%"></div></div>
+          </div>
+          <div class="sgi-process-count">28</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="sgi-card">
+      <div class="sgi-card-header">
+        <div class="sgi-card-title"><i class="bi bi-clock-history" style="color:var(--sgi-primary)"></i> Recent Activity</div>
+        <button class="btn btn-sm btn-outline" onclick="showPage('history')">View History</button>
+      </div>
+      <div class="sgi-card-body" style="padding:0 20px">
+        <div class="sgi-history-item">
+          <div class="sgi-history-icon" style="background:rgba(46,125,50,0.1);color:var(--sgi-success)"><i class="bi bi-plus-circle"></i></div>
+          <div>
+            <div class="fw-600">Stock Added</div>
+            <div class="text-sm text-muted">ITM001 - Brass Fitting 12mm — <strong>120 pcs</strong></div>
+            <div class="sgi-history-time">09:14 AM • Pravin Kumar</div>
+          </div>
+        </div>
+        <div class="sgi-history-item">
+          <div class="sgi-history-icon" style="background:rgba(1,87,155,0.1);color:var(--sgi-info)"><i class="bi bi-arrow-right-circle"></i></div>
+          <div>
+            <div class="fw-600">Stock Moved</div>
+            <div class="text-sm text-muted">ITM003 - Turning → Drilling — <strong>60 pcs</strong></div>
+            <div class="sgi-history-time">08:45 AM • Ketan D</div>
+          </div>
+        </div>
+        <div class="sgi-history-item">
+          <div class="sgi-history-icon" style="background:rgba(230,81,0,0.1);color:var(--sgi-primary)"><i class="bi bi-truck"></i></div>
+          <div>
+            <div class="fw-600">Dispatch Created</div>
+            <div class="text-sm text-muted">50 pcs → Jaipur Hardware House</div>
+            <div class="sgi-history-time">08:00 AM • Pravin Kumar</div>
+          </div>
+        </div>
+        <div class="sgi-history-item">
+          <div class="sgi-history-icon" style="background:rgba(46,125,50,0.1);color:var(--sgi-success)"><i class="bi bi-check2-circle"></i></div>
+          <div>
+            <div class="fw-600">Completed</div>
+            <div class="text-sm text-muted">ITM002 - SS Pipe 1/2" — <strong>48 pcs</strong></div>
+            <div class="sgi-history-time">Yesterday, 06:30 PM • Jayesh P</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="sgi-card">
+      <div class="sgi-card-header"><div class="sgi-card-title"><i class="bi bi-lightning" style="color:var(--sgi-primary)"></i> Quick Actions</div></div>
+      <div class="sgi-card-body" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <button class="btn btn-primary" onclick="showPage('add-stock')"><i class="bi bi-plus-lg"></i> Add Stock</button>
+        <button class="btn btn-outline" onclick="showPage('move-stock')"><i class="bi bi-arrow-left-right"></i> Move Stock</button>
+        <button class="btn btn-outline" onclick="showPage('dispatch')"><i class="bi bi-truck"></i> New Dispatch</button>
+        <button class="btn btn-outline" onclick="showPage('planning')"><i class="bi bi-kanban"></i> Planning</button>
+        <button class="btn btn-outline" onclick="showPage('by-process')"><i class="bi bi-diagram-3"></i> By Process</button>
+        <button class="btn btn-outline" onclick="showPage('by-assignee')"><i class="bi bi-people"></i> By Assignee</button>
+      </div>
+    </div>
+
+    <!-- Active Plans -->
+    <div class="sgi-card">
+      <div class="sgi-card-header">
+        <div class="sgi-card-title"><i class="bi bi-kanban" style="color:var(--sgi-primary)"></i> Active Plans</div>
+        <button class="btn btn-sm btn-outline" onclick="showPage('planning')">View All</button>
+      </div>
+      <div class="sgi-card-body" style="padding:0 20px">
+        <div class="sgi-history-item">
+          <div class="sgi-history-icon sgi-badge-orange" style="width:34px;height:34px;border-radius:6px;font-size:12px"><i class="bi bi-kanban"></i></div>
+          <div style="flex:1">
+            <div class="fw-600">Order #2026-001</div>
+            <div class="text-sm text-muted">50× BF-100, 30× SS-200</div>
+            <div class="sgi-progress mt-16" style="margin-top:8px"><div class="sgi-progress-bar" style="width:65%"></div></div>
+            <div class="text-sm text-muted" style="margin-top:4px">65% complete</div>
+          </div>
+          <span class="sgi-badge sgi-badge-green">Active</span>
+        </div>
+        <div class="sgi-history-item">
+          <div class="sgi-history-icon sgi-badge-blue" style="width:34px;height:34px;border-radius:6px;font-size:12px"><i class="bi bi-kanban"></i></div>
+          <div style="flex:1">
+            <div class="fw-600">Order #2026-002</div>
+            <div class="text-sm text-muted">25× MS-050</div>
+            <div class="sgi-progress mt-16" style="margin-top:8px"><div class="sgi-progress-bar blue" style="width:30%"></div></div>
+            <div class="text-sm text-muted" style="margin-top:4px">30% complete</div>
+          </div>
+          <span class="sgi-badge sgi-badge-orange">In Progress</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PAGE: ITEM CATALOG ============ -->
+<section class="sgi-page" id="page-catalog">
+  <div class="sgi-page-header">
+    <div>
+      <div class="sgi-page-title">Item Catalog</div>
+      <div class="sgi-page-subtitle">8 items registered</div>
+    </div>
+    <div class="sgi-page-actions">
+      <button class="btn btn-primary" onclick="openModal('addItemModal')"><i class="bi bi-plus-lg"></i> Add Item</button>
+    </div>
+  </div>
+  <div class="sgi-filter-bar">
+    <div class="sgi-search-wrap"><i class="bi bi-search"></i><input class="sgi-search-input" placeholder="Search items..." oninput="filterTable('catalogTable', this.value)"></div>
+    <select class="sgi-filter-select" onchange="filterTableBySelect('catalogTable', this.value, 2)">
+      <option value="">All Categories</option>
+      <option>Fittings</option>
+      <option>Pipes</option>
+      <option>Valves</option>
+      <option>Hardware</option>
+    </select>
+    <select class="sgi-filter-select">
+      <option value="">All Stock</option>
+      <option>In Stock</option>
+      <option>Low Stock</option>
+    </select>
+  </div>
+  <div class="sgi-table-wrap">
+    <table class="sgi-table" id="catalogTable">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Code</th>
+          <th>Category</th>
+          <th>Total Stock</th>
+          <th>Unit</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div><span class="item-name">Brass Fitting 12mm</span></div></td>
+          <td><span class="item-code">ITM001</span></td>
+          <td>Fittings</td>
+          <td><span class="qty-cell">500</span></td>
+          <td>pcs</td>
+          <td><span class="sgi-badge sgi-badge-green">In Stock</span></td>
+          <td><div class="td-actions"><button class="btn btn-sm btn-outline" onclick="showToast('Viewing ITM001','info')"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline" onclick="showToast('Editing ITM001','info')"><i class="bi bi-pencil"></i></button></div></td>
+        </tr>
+        <tr>
+          <td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div><span class="item-name">SS Pipe 1/2"</span></div></td>
+          <td><span class="item-code">ITM002</span></td>
+          <td>Pipes</td>
+          <td><span class="qty-cell">320</span></td>
+          <td>pcs</td>
+          <td><span class="sgi-badge sgi-badge-green">In Stock</span></td>
+          <td><div class="td-actions"><button class="btn btn-sm btn-outline" onclick="showToast('Viewing ITM002','info')"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline"><i class="bi bi-pencil"></i></button></div></td>
+        </tr>
+        <tr>
+          <td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div><span class="item-name">Copper Elbow 90°</span></div></td>
+          <td><span class="item-code">ITM003</span></td>
+          <td>Fittings</td>
+          <td><span class="qty-cell">180</span></td>
+          <td>pcs</td>
+          <td><span class="sgi-badge sgi-badge-yellow">Low Stock</span></td>
+          <td><div class="td-actions"><button class="btn btn-sm btn-outline"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline"><i class="bi bi-pencil"></i></button></div></td>
+        </tr>
+        <tr>
+          <td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div><span class="item-name">GI Nipple 15mm</span></div></td>
+          <td><span class="item-code">ITM004</span></td>
+          <td>Fittings</td>
+          <td><span class="qty-cell">450</span></td>
+          <td>pcs</td>
+          <td><span class="sgi-badge sgi-badge-green">In Stock</span></td>
+          <td><div class="td-actions"><button class="btn btn-sm btn-outline"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline"><i class="bi bi-pencil"></i></button></div></td>
+        </tr>
+        <tr>
+          <td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div><span class="item-name">SS Valve 1/4"</span></div></td>
+          <td><span class="item-code">ITM005</span></td>
+          <td>Valves</td>
+          <td><span class="qty-cell">90</span></td>
+          <td>pcs</td>
+          <td><span class="sgi-badge sgi-badge-red">Low Stock</span></td>
+          <td><div class="td-actions"><button class="btn btn-sm btn-outline"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline"><i class="bi bi-pencil"></i></button></div></td>
+        </tr>
+        <tr>
+          <td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div><span class="item-name">Brass Nut 10mm</span></div></td>
+          <td><span class="item-code">ITM006</span></td>
+          <td>Hardware</td>
+          <td><span class="qty-cell">1200</span></td>
+          <td>pcs</td>
+          <td><span class="sgi-badge sgi-badge-green">In Stock</span></td>
+          <td><div class="td-actions"><button class="btn btn-sm btn-outline"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline"><i class="bi bi-pencil"></i></button></div></td>
+        </tr>
+        <tr>
+          <td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div><span class="item-name">PVC Pipe 3/4"</span></div></td>
+          <td><span class="item-code">ITM007</span></td>
+          <td>Pipes</td>
+          <td><span class="qty-cell">200</span></td>
+          <td>pcs</td>
+          <td><span class="sgi-badge sgi-badge-green">In Stock</span></td>
+          <td><div class="td-actions"><button class="btn btn-sm btn-outline"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline"><i class="bi bi-pencil"></i></button></div></td>
+        </tr>
+        <tr>
+          <td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div><span class="item-name">SS Elbow 90°</span></div></td>
+          <td><span class="item-code">ITM008</span></td>
+          <td>Fittings</td>
+          <td><span class="qty-cell">150</span></td>
+          <td>pcs</td>
+          <td><span class="sgi-badge sgi-badge-yellow">Low Stock</span></td>
+          <td><div class="td-actions"><button class="btn btn-sm btn-outline"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline"><i class="bi bi-pencil"></i></button></div></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ PAGE: INVENTORY ============ -->
+<section class="sgi-page" id="page-inventory">
+  <div class="sgi-page-header">
+    <div>
+      <div class="sgi-page-title">Inventory</div>
+      <div class="sgi-page-subtitle">10 active inventory entries</div>
+    </div>
+    <div class="sgi-page-actions">
+      <button class="btn btn-primary" onclick="showPage('add-stock')"><i class="bi bi-plus-lg"></i> Add Stock</button>
+      <button class="btn btn-outline" onclick="showPage('move-stock')"><i class="bi bi-arrow-left-right"></i> Move Stock</button>
+    </div>
+  </div>
+  <div class="sgi-filter-bar">
+    <div class="sgi-search-wrap"><i class="bi bi-search"></i><input class="sgi-search-input" placeholder="Search inventory..." oninput="filterTable('inventoryTable', this.value)"></div>
+    <select class="sgi-filter-select">
+      <option value="">All Processes</option>
+      <option>Incoming</option><option>Turning</option><option>Drilling</option><option>Finishing</option><option>QC</option>
+    </select>
+    <select class="sgi-filter-select">
+      <option value="">All Assignees</option>
+      <option>Pravin K</option><option>Ketan D</option><option>Jayesh P</option><option>Ramesh S</option><option>Mahesh T</option>
+    </select>
+    <button class="btn btn-outline btn-sm" onclick="exportDemo()"><i class="bi bi-download"></i> Export</button>
+  </div>
+  <div class="sgi-table-wrap">
+    <table class="sgi-table" id="inventoryTable">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Code</th>
+          <th>Process</th>
+          <th>Quantity</th>
+          <th>Assignee</th>
+          <th>Updated</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div><span class="item-name">Brass Fitting 12mm</span></div></td><td><span class="item-code">ITM001</span></td><td><span class="sgi-badge sgi-badge-orange">Incoming</span></td><td><span class="qty-cell">120</span></td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar">PK</div><span class="sgi-assignee-name">Pravin K</span></div></td><td class="text-muted">27 Nov 09:14</td><td><div class="td-actions"><button class="btn btn-sm btn-outline" onclick="showPage('move-stock')"><i class="bi bi-arrow-right"></i> Move</button></div></td></tr>
+        <tr><td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div><span class="item-name">SS Pipe 1/2"</span></div></td><td><span class="item-code">ITM002</span></td><td><span class="sgi-badge sgi-badge-blue">Turning</span></td><td><span class="qty-cell">85</span></td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar" style="background:#01579B">KD</div><span class="sgi-assignee-name">Ketan D</span></div></td><td class="text-muted">27 Nov 08:45</td><td><div class="td-actions"><button class="btn btn-sm btn-outline" onclick="showPage('move-stock')"><i class="bi bi-arrow-right"></i> Move</button></div></td></tr>
+        <tr><td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div><span class="item-name">Copper Elbow 90°</span></div></td><td><span class="item-code">ITM003</span></td><td><span class="sgi-badge sgi-badge-purple">Drilling</span></td><td><span class="qty-cell">60</span></td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar" style="background:#2E7D32">JP</div><span class="sgi-assignee-name">Jayesh P</span></div></td><td class="text-muted">26 Nov 17:30</td><td><div class="td-actions"><button class="btn btn-sm btn-outline" onclick="showPage('move-stock')"><i class="bi bi-arrow-right"></i> Move</button></div></td></tr>
+        <tr><td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div><span class="item-name">GI Nipple 15mm</span></div></td><td><span class="item-code">ITM004</span></td><td><span class="sgi-badge sgi-badge-orange">Finishing</span></td><td><span class="qty-cell">45</span></td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar" style="background:#C62828">RS</div><span class="sgi-assignee-name">Ramesh S</span></div></td><td class="text-muted">26 Nov 15:20</td><td><div class="td-actions"><button class="btn btn-sm btn-outline" onclick="showPage('move-stock')"><i class="bi bi-arrow-right"></i> Move</button></div></td></tr>
+        <tr><td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div><span class="item-name">SS Valve 1/4"</span></div></td><td><span class="item-code">ITM005</span></td><td><span class="sgi-badge sgi-badge-green">QC</span></td><td><span class="qty-cell">30</span></td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar" style="background:#6A1B9A">MT</div><span class="sgi-assignee-name">Mahesh T</span></div></td><td class="text-muted">26 Nov 11:00</td><td><div class="td-actions"><button class="btn btn-sm btn-outline" onclick="showPage('move-stock')"><i class="bi bi-arrow-right"></i> Move</button></div></td></tr>
+        <tr><td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div><span class="item-name">Brass Nut 10mm</span></div></td><td><span class="item-code">ITM006</span></td><td><span class="sgi-badge sgi-badge-orange">Incoming</span></td><td><span class="qty-cell">200</span></td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar">PK</div><span class="sgi-assignee-name">Pravin K</span></div></td><td class="text-muted">25 Nov 10:00</td><td><div class="td-actions"><button class="btn btn-sm btn-outline" onclick="showPage('move-stock')"><i class="bi bi-arrow-right"></i> Move</button></div></td></tr>
+        <tr><td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div><span class="item-name">PVC Pipe 3/4"</span></div></td><td><span class="item-code">ITM007</span></td><td><span class="sgi-badge sgi-badge-blue">Turning</span></td><td><span class="qty-cell">75</span></td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar" style="background:#01579B">KD</div><span class="sgi-assignee-name">Ketan D</span></div></td><td class="text-muted">25 Nov 09:15</td><td><div class="td-actions"><button class="btn btn-sm btn-outline" onclick="showPage('move-stock')"><i class="bi bi-arrow-right"></i> Move</button></div></td></tr>
+        <tr><td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div><span class="item-name">SS Elbow 90°</span></div></td><td><span class="item-code">ITM008</span></td><td><span class="sgi-badge sgi-badge-purple">Drilling</span></td><td><span class="qty-cell">40</span></td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar" style="background:#2E7D32">JP</div><span class="sgi-assignee-name">Jayesh P</span></div></td><td class="text-muted">24 Nov 16:45</td><td><div class="td-actions"><button class="btn btn-sm btn-outline" onclick="showPage('move-stock')"><i class="bi bi-arrow-right"></i> Move</button></div></td></tr>
+        <tr><td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div><span class="item-name">Brass Fitting 12mm</span></div></td><td><span class="item-code">ITM001</span></td><td><span class="sgi-badge sgi-badge-orange">Finishing</span></td><td><span class="qty-cell">55</span></td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar" style="background:#C62828">RS</div><span class="sgi-assignee-name">Ramesh S</span></div></td><td class="text-muted">24 Nov 14:00</td><td><div class="td-actions"><button class="btn btn-sm btn-outline" onclick="showPage('move-stock')"><i class="bi bi-arrow-right"></i> Move</button></div></td></tr>
+        <tr><td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div><span class="item-name">GI Nipple 15mm</span></div></td><td><span class="item-code">ITM004</span></td><td><span class="sgi-badge sgi-badge-green">QC</span></td><td><span class="qty-cell">22</span></td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar" style="background:#6A1B9A">MT</div><span class="sgi-assignee-name">Mahesh T</span></div></td><td class="text-muted">23 Nov 13:30</td><td><div class="td-actions"><button class="btn btn-sm btn-outline" onclick="showPage('move-stock')"><i class="bi bi-arrow-right"></i> Move</button></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ PAGE: ADD STOCK ============ -->
+<section class="sgi-page" id="page-add-stock">
+  <div class="sgi-page-header">
+    <div>
+      <div class="sgi-page-title">Add Stock</div>
+      <div class="sgi-page-subtitle">Record new incoming stock entry</div>
+    </div>
+  </div>
+  <div class="sgi-card" style="max-width:720px">
+    <div class="sgi-card-header"><div class="sgi-card-title"><i class="bi bi-plus-circle" style="color:var(--sgi-primary)"></i> New Stock Entry</div></div>
+    <div class="sgi-card-body">
+      <form onsubmit="handleAddStock(event)">
+        <div class="sgi-form-grid">
+          <div class="sgi-form-group">
+            <label class="sgi-form-label">Item <span>*</span></label>
+            <select class="sgi-form-control" required>
+              <option value="">Select Item...</option>
+              <option>ITM001 - Brass Fitting 12mm</option>
+              <option>ITM002 - SS Pipe 1/2"</option>
+              <option>ITM003 - Copper Elbow 90°</option>
+              <option>ITM004 - GI Nipple 15mm</option>
+              <option>ITM005 - SS Valve 1/4"</option>
+              <option>ITM006 - Brass Nut 10mm</option>
+              <option>ITM007 - PVC Pipe 3/4"</option>
+              <option>ITM008 - SS Elbow 90°</option>
+            </select>
+          </div>
+          <div class="sgi-form-group">
+            <label class="sgi-form-label">Quantity <span>*</span></label>
+            <input type="number" class="sgi-form-control" placeholder="Enter quantity" min="1" required>
+          </div>
+          <div class="sgi-form-group">
+            <label class="sgi-form-label">Process <span>*</span></label>
+            <select class="sgi-form-control" required>
+              <option value="">Select Process...</option>
+              <option>Incoming</option><option>Turning</option><option>Drilling</option><option>Finishing</option><option>QC</option>
+            </select>
+          </div>
+          <div class="sgi-form-group">
+            <label class="sgi-form-label">Assigned To</label>
+            <select class="sgi-form-control">
+              <option value="">Select Assignee...</option>
+              <option>Pravin Kumar</option><option>Ketan D</option><option>Jayesh P</option><option>Ramesh S</option><option>Mahesh T</option>
+            </select>
+          </div>
+          <div class="sgi-form-group">
+            <label class="sgi-form-label">Lot / Batch No.</label>
+            <input type="text" class="sgi-form-control" placeholder="e.g. LOT-2026-001">
+          </div>
+          <div class="sgi-form-group">
+            <label class="sgi-form-label">Date</label>
+            <input type="date" class="sgi-form-control" value="2026-11-27">
+          </div>
+          <div class="sgi-form-group" style="grid-column:1/-1">
+            <label class="sgi-form-label">Notes</label>
+            <textarea class="sgi-form-control" placeholder="Optional notes about this stock entry..."></textarea>
+          </div>
+        </div>
+        <div class="sgi-form-actions">
+          <button type="button" class="btn btn-outline" onclick="showPage('inventory')">Cancel</button>
+          <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Add Stock</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PAGE: MOVE STOCK ============ -->
+<section class="sgi-page" id="page-move-stock">
+  <div class="sgi-page-header">
+    <div>
+      <div class="sgi-page-title">Move Stock</div>
+      <div class="sgi-page-subtitle">Transfer stock between processes or assignees</div>
+    </div>
+  </div>
+  <div class="sgi-card" style="max-width:720px">
+    <div class="sgi-card-header"><div class="sgi-card-title"><i class="bi bi-arrow-left-right" style="color:var(--sgi-primary)"></i> Stock Transfer</div></div>
+    <div class="sgi-card-body">
+      <form onsubmit="handleMoveStock(event)">
+        <div class="sgi-form-grid">
+          <div class="sgi-form-group">
+            <label class="sgi-form-label">Select Inventory Entry <span>*</span></label>
+            <select class="sgi-form-control" required>
+              <option value="">Select entry...</option>
+              <option>ITM001 — Incoming — 120 pcs (Pravin K)</option>
+              <option>ITM002 — Turning — 85 pcs (Ketan D)</option>
+              <option>ITM003 — Drilling — 60 pcs (Jayesh P)</option>
+              <option>ITM004 — Finishing — 45 pcs (Ramesh S)</option>
+              <option>ITM005 — QC — 30 pcs (Mahesh T)</option>
+            </select>
+          </div>
+          <div class="sgi-form-group">
+            <label class="sgi-form-label">Quantity to Move <span>*</span></label>
+            <input type="number" class="sgi-form-control" placeholder="Enter quantity" min="1" required>
+          </div>
+          <div class="sgi-form-group">
+            <label class="sgi-form-label">Move To Process <span>*</span></label>
+            <select class="sgi-form-control" required>
+              <option value="">Select process...</option>
+              <option>Turning</option><option>Drilling</option><option>Finishing</option><option>QC</option><option>Completed</option>
+            </select>
+          </div>
+          <div class="sgi-form-group">
+            <label class="sgi-form-label">New Assignee</label>
+            <select class="sgi-form-control">
+              <option value="">Keep same assignee</option>
+              <option>Pravin Kumar</option><option>Ketan D</option><option>Jayesh P</option><option>Ramesh S</option><option>Mahesh T</option>
+            </select>
+          </div>
+          <div class="sgi-form-group" style="grid-column:1/-1">
+            <label class="sgi-form-label">Reason / Notes</label>
+            <textarea class="sgi-form-control" placeholder="Reason for transfer..."></textarea>
+          </div>
+        </div>
+        <div class="sgi-form-actions">
+          <button type="button" class="btn btn-outline" onclick="showPage('inventory')">Cancel</button>
+          <button type="submit" class="btn btn-primary"><i class="bi bi-arrow-right-circle"></i> Move Stock</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PAGE: STOCK HISTORY ============ -->
+<section class="sgi-page" id="page-history">
+  <div class="sgi-page-header">
+    <div>
+      <div class="sgi-page-title">Stock History</div>
+      <div class="sgi-page-subtitle">Complete log of all stock movements</div>
+    </div>
+    <div class="sgi-page-actions">
+      <button class="btn btn-outline btn-sm" onclick="exportDemo()"><i class="bi bi-download"></i> Export</button>
+    </div>
+  </div>
+  <div class="sgi-filter-bar">
+    <div class="sgi-search-wrap"><i class="bi bi-search"></i><input class="sgi-search-input" placeholder="Search history..." oninput="filterTable('historyTable', this.value)"></div>
+    <select class="sgi-filter-select">
+      <option value="">All Actions</option>
+      <option>Add Stock</option><option>Move Stock</option><option>Completed</option>
+    </select>
+    <select class="sgi-filter-select">
+      <option value="">All Items</option>
+      <option>ITM001</option><option>ITM002</option><option>ITM003</option><option>ITM004</option>
+    </select>
+  </div>
+  <div class="sgi-table-wrap">
+    <table class="sgi-table" id="historyTable">
+      <thead>
+        <tr><th>Date & Time</th><th>Action</th><th>Item</th><th>Qty</th><th>From</th><th>To</th><th>Assignee</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="text-muted">27 Nov 09:14</td><td><span class="sgi-badge sgi-badge-green">Add Stock</span></td><td><span class="item-code">ITM001</span> Brass Fitting 12mm</td><td class="fw-600">120</td><td>—</td><td><span class="sgi-badge sgi-badge-orange">Incoming</span></td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar" style="font-size:10px">PK</div>Pravin K</div></td><td class="text-muted">Fresh lot received</td></tr>
+        <tr><td class="text-muted">27 Nov 08:45</td><td><span class="sgi-badge sgi-badge-blue">Move</span></td><td><span class="item-code">ITM003</span> Copper Elbow 90°</td><td class="fw-600">60</td><td><span class="sgi-badge sgi-badge-blue">Turning</span></td><td><span class="sgi-badge sgi-badge-purple">Drilling</span></td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar" style="background:#01579B;font-size:10px">KD</div>Ketan D</div></td><td class="text-muted">Batch #3 moved</td></tr>
+        <tr><td class="text-muted">26 Nov 17:30</td><td><span class="sgi-badge sgi-badge-green">Add Stock</span></td><td><span class="item-code">ITM006</span> Brass Nut 10mm</td><td class="fw-600">200</td><td>—</td><td><span class="sgi-badge sgi-badge-orange">Incoming</span></td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar" style="font-size:10px">PK</div>Pravin K</div></td><td class="text-muted">—</td></tr>
+        <tr><td class="text-muted">26 Nov 15:20</td><td><span class="sgi-badge sgi-badge-blue">Move</span></td><td><span class="item-code">ITM004</span> GI Nipple 15mm</td><td class="fw-600">45</td><td><span class="sgi-badge sgi-badge-purple">Drilling</span></td><td><span class="sgi-badge sgi-badge-orange">Finishing</span></td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar" style="background:#C62828;font-size:10px">RS</div>Ramesh S</div></td><td class="text-muted">Priority order</td></tr>
+        <tr><td class="text-muted">26 Nov 11:00</td><td><span class="sgi-badge sgi-badge-blue">Move</span></td><td><span class="item-code">ITM005</span> SS Valve 1/4"</td><td class="fw-600">30</td><td><span class="sgi-badge sgi-badge-orange">Finishing</span></td><td><span class="sgi-badge sgi-badge-green">QC</span></td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar" style="background:#6A1B9A;font-size:10px">MT</div>Mahesh T</div></td><td class="text-muted">QC check batch</td></tr>
+        <tr><td class="text-muted">25 Nov 10:00</td><td><span class="sgi-badge sgi-badge-grey">Completed</span></td><td><span class="item-code">ITM002</span> SS Pipe 1/2"</td><td class="fw-600">48</td><td><span class="sgi-badge sgi-badge-green">QC</span></td><td><span class="sgi-badge sgi-badge-grey">Completed</span></td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar" style="background:#2E7D32;font-size:10px">JP</div>Jayesh P</div></td><td class="text-muted">Order fulfilled</td></tr>
+        <tr><td class="text-muted">24 Nov 16:45</td><td><span class="sgi-badge sgi-badge-green">Add Stock</span></td><td><span class="item-code">ITM007</span> PVC Pipe 3/4"</td><td class="fw-600">75</td><td>—</td><td><span class="sgi-badge sgi-badge-orange">Incoming</span></td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar" style="background:#01579B;font-size:10px">KD</div>Ketan D</div></td><td class="text-muted">New purchase</td></tr>
+        <tr><td class="text-muted">23 Nov 13:30</td><td><span class="sgi-badge sgi-badge-blue">Move</span></td><td><span class="item-code">ITM008</span> SS Elbow 90°</td><td class="fw-600">40</td><td><span class="sgi-badge sgi-badge-orange">Incoming</span></td><td><span class="sgi-badge sgi-badge-purple">Drilling</span></td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar" style="background:#2E7D32;font-size:10px">JP</div>Jayesh P</div></td><td class="text-muted">—</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ PAGE: COMPLETED STOCK ============ -->
+<section class="sgi-page" id="page-completed">
+  <div class="sgi-page-header">
+    <div>
+      <div class="sgi-page-title">Completed Stock</div>
+      <div class="sgi-page-subtitle">All units that have finished the production cycle</div>
+    </div>
+  </div>
+  <div class="sgi-filter-bar">
+    <div class="sgi-search-wrap"><i class="bi bi-search"></i><input class="sgi-search-input" placeholder="Search completed..." oninput="filterTable('completedTable', this.value)"></div>
+    <select class="sgi-filter-select">
+      <option value="">All Items</option>
+      <option>ITM001</option><option>ITM002</option><option>ITM004</option>
+    </select>
+  </div>
+  <div class="sgi-table-wrap">
+    <table class="sgi-table" id="completedTable">
+      <thead>
+        <tr><th>Item</th><th>Code</th><th>Completed Qty</th><th>Assignee</th><th>Assigned At</th><th>Completed At</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div><span class="item-name">SS Pipe 1/2"</span></div></td><td><span class="item-code">ITM002</span></td><td><span class="qty-cell">48</span></td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar" style="background:#2E7D32">JP</div><span class="sgi-assignee-name">Jayesh P</span></div></td><td class="text-muted">24 Nov, 10:00</td><td class="text-muted">25 Nov, 10:00</td></tr>
+        <tr><td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div><span class="item-name">Brass Fitting 12mm</span></div></td><td><span class="item-code">ITM001</span></td><td><span class="qty-cell">75</span></td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar">PK</div><span class="sgi-assignee-name">Pravin K</span></div></td><td class="text-muted">22 Nov, 09:00</td><td class="text-muted">23 Nov, 15:30</td></tr>
+        <tr><td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div><span class="item-name">GI Nipple 15mm</span></div></td><td><span class="item-code">ITM004</span></td><td><span class="qty-cell">100</span></td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar" style="background:#C62828">RS</div><span class="sgi-assignee-name">Ramesh S</span></div></td><td class="text-muted">20 Nov, 08:30</td><td class="text-muted">22 Nov, 17:00</td></tr>
+        <tr><td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div><span class="item-name">Brass Nut 10mm</span></div></td><td><span class="item-code">ITM006</span></td><td><span class="qty-cell">119</span></td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar" style="background:#6A1B9A">MT</div><span class="sgi-assignee-name">Mahesh T</span></div></td><td class="text-muted">18 Nov, 11:00</td><td class="text-muted">20 Nov, 16:00</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ PAGE: BY PROCESS ============ -->
+<section class="sgi-page" id="page-by-process">
+  <div class="sgi-page-header">
+    <div>
+      <div class="sgi-page-title">Stock by Process</div>
+      <div class="sgi-page-subtitle">View inventory grouped by production process</div>
+    </div>
+  </div>
+  <div class="sgi-tabs" id="processTabs">
+    <button class="sgi-tab active" onclick="switchTab('processTabs','processContents','tab-incoming')">Incoming (85)</button>
+    <button class="sgi-tab" onclick="switchTab('processTabs','processContents','tab-turning')">Turning (62)</button>
+    <button class="sgi-tab" onclick="switchTab('processTabs','processContents','tab-drilling')">Drilling (47)</button>
+    <button class="sgi-tab" onclick="switchTab('processTabs','processContents','tab-finishing')">Finishing (38)</button>
+    <button class="sgi-tab" onclick="switchTab('processTabs','processContents','tab-qc')">QC (28)</button>
+  </div>
+  <div id="processContents">
+    <div class="sgi-tab-content active" id="tab-incoming">
+      <div class="sgi-table-wrap">
+        <table class="sgi-table">
+          <thead><tr><th>Item</th><th>Code</th><th>Quantity</th><th>Assignee</th><th>Phone</th><th>Assigned At</th></tr></thead>
+          <tbody>
+            <tr><td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div>Brass Fitting 12mm</div></td><td><span class="item-code">ITM001</span></td><td class="fw-700">120</td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar">PK</div>Pravin K</div></td><td><a class="sgi-phone-link" href="tel:+919876543210"><i class="bi bi-telephone-fill"></i> +91 98765 43210</a></td><td class="text-muted">27 Nov, 09:14 AM</td></tr>
+            <tr><td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div>Brass Nut 10mm</div></td><td><span class="item-code">ITM006</span></td><td class="fw-700">200</td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar">PK</div>Pravin K</div></td><td><a class="sgi-phone-link" href="tel:+919876543210"><i class="bi bi-telephone-fill"></i> +91 98765 43210</a></td><td class="text-muted">25 Nov, 10:00 AM</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="sgi-tab-content" id="tab-turning">
+      <div class="sgi-table-wrap">
+        <table class="sgi-table">
+          <thead><tr><th>Item</th><th>Code</th><th>Quantity</th><th>Assignee</th><th>Phone</th><th>Assigned At</th></tr></thead>
+          <tbody>
+            <tr><td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div>SS Pipe 1/2"</div></td><td><span class="item-code">ITM002</span></td><td class="fw-700">85</td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar" style="background:#01579B">KD</div>Ketan D</div></td><td><a class="sgi-phone-link" href="tel:+919876500001"><i class="bi bi-telephone-fill"></i> +91 98765 00001</a></td><td class="text-muted">27 Nov, 08:45 AM</td></tr>
+            <tr><td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div>PVC Pipe 3/4"</div></td><td><span class="item-code">ITM007</span></td><td class="fw-700">75</td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar" style="background:#01579B">KD</div>Ketan D</div></td><td><a class="sgi-phone-link" href="tel:+919876500001"><i class="bi bi-telephone-fill"></i> +91 98765 00001</a></td><td class="text-muted">25 Nov, 09:15 AM</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="sgi-tab-content" id="tab-drilling">
+      <div class="sgi-table-wrap">
+        <table class="sgi-table">
+          <thead><tr><th>Item</th><th>Code</th><th>Quantity</th><th>Assignee</th><th>Phone</th><th>Assigned At</th></tr></thead>
+          <tbody>
+            <tr><td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div>Copper Elbow 90°</div></td><td><span class="item-code">ITM003</span></td><td class="fw-700">60</td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar" style="background:#2E7D32">JP</div>Jayesh P</div></td><td><a class="sgi-phone-link" href="tel:+919876500002"><i class="bi bi-telephone-fill"></i> +91 98765 00002</a></td><td class="text-muted">26 Nov, 17:30 PM</td></tr>
+            <tr><td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div>SS Elbow 90°</div></td><td><span class="item-code">ITM008</span></td><td class="fw-700">40</td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar" style="background:#2E7D32">JP</div>Jayesh P</div></td><td><a class="sgi-phone-link" href="tel:+919876500002"><i class="bi bi-telephone-fill"></i> +91 98765 00002</a></td><td class="text-muted">24 Nov, 16:45 PM</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="sgi-tab-content" id="tab-finishing">
+      <div class="sgi-table-wrap">
+        <table class="sgi-table">
+          <thead><tr><th>Item</th><th>Code</th><th>Quantity</th><th>Assignee</th><th>Phone</th><th>Assigned At</th></tr></thead>
+          <tbody>
+            <tr><td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div>GI Nipple 15mm</div></td><td><span class="item-code">ITM004</span></td><td class="fw-700">45</td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar" style="background:#C62828">RS</div>Ramesh S</div></td><td><a class="sgi-phone-link" href="tel:+919876500003"><i class="bi bi-telephone-fill"></i> +91 98765 00003</a></td><td class="text-muted">26 Nov, 15:20 PM</td></tr>
+            <tr><td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div>Brass Fitting 12mm</div></td><td><span class="item-code">ITM001</span></td><td class="fw-700">55</td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar" style="background:#C62828">RS</div>Ramesh S</div></td><td><a class="sgi-phone-link" href="tel:+919876500003"><i class="bi bi-telephone-fill"></i> +91 98765 00003</a></td><td class="text-muted">24 Nov, 14:00 PM</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="sgi-tab-content" id="tab-qc">
+      <div class="sgi-table-wrap">
+        <table class="sgi-table">
+          <thead><tr><th>Item</th><th>Code</th><th>Quantity</th><th>Assignee</th><th>Phone</th><th>Assigned At</th></tr></thead>
+          <tbody>
+            <tr><td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div>SS Valve 1/4"</div></td><td><span class="item-code">ITM005</span></td><td class="fw-700">30</td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar" style="background:#6A1B9A">MT</div>Mahesh T</div></td><td><a class="sgi-phone-link" href="tel:+919876500004"><i class="bi bi-telephone-fill"></i> +91 98765 00004</a></td><td class="text-muted">26 Nov, 11:00 AM</td></tr>
+            <tr><td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-box"></i></div>GI Nipple 15mm</div></td><td><span class="item-code">ITM004</span></td><td class="fw-700">22</td><td><div class="sgi-assignee"><div class="sgi-assignee-avatar" style="background:#6A1B9A">MT</div>Mahesh T</div></td><td><a class="sgi-phone-link" href="tel:+919876500004"><i class="bi bi-telephone-fill"></i> +91 98765 00004</a></td><td class="text-muted">23 Nov, 13:30 PM</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PAGE: BY ASSIGNEE ============ -->
+<section class="sgi-page" id="page-by-assignee">
+  <div class="sgi-page-header">
+    <div>
+      <div class="sgi-page-title">Stock by Assignee</div>
+      <div class="sgi-page-subtitle">View inventory grouped by worker</div>
+    </div>
+  </div>
+  <div class="sgi-tabs" id="assigneeTabs">
+    <button class="sgi-tab active" onclick="switchTab('assigneeTabs','assigneeContents','tab-pravin')">Pravin K (2)</button>
+    <button class="sgi-tab" onclick="switchTab('assigneeTabs','assigneeContents','tab-ketan')">Ketan D (2)</button>
+    <button class="sgi-tab" onclick="switchTab('assigneeTabs','assigneeContents','tab-jayesh')">Jayesh P (2)</button>
+    <button class="sgi-tab" onclick="switchTab('assigneeTabs','assigneeContents','tab-ramesh')">Ramesh S (2)</button>
+    <button class="sgi-tab" onclick="switchTab('assigneeTabs','assigneeContents','tab-mahesh')">Mahesh T (2)</button>
+  </div>
+  <div id="assigneeContents">
+    <div class="sgi-tab-content active" id="tab-pravin">
+      <div class="d-flex align-center gap-12 mb-16" style="padding:12px;background:var(--sgi-bg);border-radius:8px;margin-bottom:16px">
+        <div class="sgi-assignee-avatar" style="width:40px;height:40px;font-size:15px">PK</div>
+        <div><div class="fw-600" style="font-size:15px">Pravin Kumar</div><div class="text-muted text-sm">Supervisor</div><a class="sgi-phone-link" href="tel:+919876543210"><i class="bi bi-telephone-fill"></i> +91 98765 43210</a></div>
+      </div>
+      <div class="sgi-table-wrap"><table class="sgi-table"><thead><tr><th>Item</th><th>Code</th><th>Process</th><th>Quantity</th><th>Assigned At</th></tr></thead><tbody>
+        <tr><td>Brass Fitting 12mm</td><td><span class="item-code">ITM001</span></td><td><span class="sgi-badge sgi-badge-orange">Incoming</span></td><td class="fw-700">120</td><td class="text-muted">27 Nov, 09:14 AM</td></tr>
+        <tr><td>Brass Nut 10mm</td><td><span class="item-code">ITM006</span></td><td><span class="sgi-badge sgi-badge-orange">Incoming</span></td><td class="fw-700">200</td><td class="text-muted">25 Nov, 10:00 AM</td></tr>
+      </tbody></table></div>
+    </div>
+    <div class="sgi-tab-content" id="tab-ketan">
+      <div class="d-flex align-center gap-12 mb-16" style="padding:12px;background:var(--sgi-bg);border-radius:8px;margin-bottom:16px">
+        <div class="sgi-assignee-avatar" style="width:40px;height:40px;font-size:15px;background:#01579B">KD</div>
+        <div><div class="fw-600" style="font-size:15px">Ketan Desai</div><div class="text-muted text-sm">Turner</div><a class="sgi-phone-link" href="tel:+919876500001"><i class="bi bi-telephone-fill"></i> +91 98765 00001</a></div>
+      </div>
+      <div class="sgi-table-wrap"><table class="sgi-table"><thead><tr><th>Item</th><th>Code</th><th>Process</th><th>Quantity</th><th>Assigned At</th></tr></thead><tbody>
+        <tr><td>SS Pipe 1/2"</td><td><span class="item-code">ITM002</span></td><td><span class="sgi-badge sgi-badge-blue">Turning</span></td><td class="fw-700">85</td><td class="text-muted">27 Nov, 08:45 AM</td></tr>
+        <tr><td>PVC Pipe 3/4"</td><td><span class="item-code">ITM007</span></td><td><span class="sgi-badge sgi-badge-blue">Turning</span></td><td class="fw-700">75</td><td class="text-muted">25 Nov, 09:15 AM</td></tr>
+      </tbody></table></div>
+    </div>
+    <div class="sgi-tab-content" id="tab-jayesh">
+      <div class="d-flex align-center gap-12 mb-16" style="padding:12px;background:var(--sgi-bg);border-radius:8px;margin-bottom:16px">
+        <div class="sgi-assignee-avatar" style="width:40px;height:40px;font-size:15px;background:#2E7D32">JP</div>
+        <div><div class="fw-600" style="font-size:15px">Jayesh Patel</div><div class="text-muted text-sm">Driller</div><a class="sgi-phone-link" href="tel:+919876500002"><i class="bi bi-telephone-fill"></i> +91 98765 00002</a></div>
+      </div>
+      <div class="sgi-table-wrap"><table class="sgi-table"><thead><tr><th>Item</th><th>Code</th><th>Process</th><th>Quantity</th><th>Assigned At</th></tr></thead><tbody>
+        <tr><td>Copper Elbow 90°</td><td><span class="item-code">ITM003</span></td><td><span class="sgi-badge sgi-badge-purple">Drilling</span></td><td class="fw-700">60</td><td class="text-muted">26 Nov, 17:30 PM</td></tr>
+        <tr><td>SS Elbow 90°</td><td><span class="item-code">ITM008</span></td><td><span class="sgi-badge sgi-badge-purple">Drilling</span></td><td class="fw-700">40</td><td class="text-muted">24 Nov, 16:45 PM</td></tr>
+      </tbody></table></div>
+    </div>
+    <div class="sgi-tab-content" id="tab-ramesh">
+      <div class="d-flex align-center gap-12 mb-16" style="padding:12px;background:var(--sgi-bg);border-radius:8px;margin-bottom:16px">
+        <div class="sgi-assignee-avatar" style="width:40px;height:40px;font-size:15px;background:#C62828">RS</div>
+        <div><div class="fw-600" style="font-size:15px">Ramesh Shah</div><div class="text-muted text-sm">Finisher</div><a class="sgi-phone-link" href="tel:+919876500003"><i class="bi bi-telephone-fill"></i> +91 98765 00003</a></div>
+      </div>
+      <div class="sgi-table-wrap"><table class="sgi-table"><thead><tr><th>Item</th><th>Code</th><th>Process</th><th>Quantity</th><th>Assigned At</th></tr></thead><tbody>
+        <tr><td>GI Nipple 15mm</td><td><span class="item-code">ITM004</span></td><td><span class="sgi-badge sgi-badge-orange">Finishing</span></td><td class="fw-700">45</td><td class="text-muted">26 Nov, 15:20 PM</td></tr>
+        <tr><td>Brass Fitting 12mm</td><td><span class="item-code">ITM001</span></td><td><span class="sgi-badge sgi-badge-orange">Finishing</span></td><td class="fw-700">55</td><td class="text-muted">24 Nov, 14:00 PM</td></tr>
+      </tbody></table></div>
+    </div>
+    <div class="sgi-tab-content" id="tab-mahesh">
+      <div class="d-flex align-center gap-12 mb-16" style="padding:12px;background:var(--sgi-bg);border-radius:8px;margin-bottom:16px">
+        <div class="sgi-assignee-avatar" style="width:40px;height:40px;font-size:15px;background:#6A1B9A">MT</div>
+        <div><div class="fw-600" style="font-size:15px">Mahesh Thakur</div><div class="text-muted text-sm">QC Inspector</div><a class="sgi-phone-link" href="tel:+919876500004"><i class="bi bi-telephone-fill"></i> +91 98765 00004</a></div>
+      </div>
+      <div class="sgi-table-wrap"><table class="sgi-table"><thead><tr><th>Item</th><th>Code</th><th>Process</th><th>Quantity</th><th>Assigned At</th></tr></thead><tbody>
+        <tr><td>SS Valve 1/4"</td><td><span class="item-code">ITM005</span></td><td><span class="sgi-badge sgi-badge-green">QC</span></td><td class="fw-700">30</td><td class="text-muted">26 Nov, 11:00 AM</td></tr>
+        <tr><td>GI Nipple 15mm</td><td><span class="item-code">ITM004</span></td><td><span class="sgi-badge sgi-badge-green">QC</span></td><td class="fw-700">22</td><td class="text-muted">23 Nov, 13:30 PM</td></tr>
+      </tbody></table></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PAGE: PRODUCTS ============ -->
+<section class="sgi-page" id="page-products">
+  <div class="sgi-page-header">
+    <div><div class="sgi-page-title">Products</div><div class="sgi-page-subtitle">4 active products registered</div></div>
+    <div class="sgi-page-actions">
+      <button class="btn btn-primary" onclick="openModal('addProductModal')"><i class="bi bi-plus-lg"></i> Add Product</button>
+    </div>
+  </div>
+  <div class="sgi-filter-bar">
+    <div class="sgi-search-wrap"><i class="bi bi-search"></i><input class="sgi-search-input" placeholder="Search products..." oninput="filterTable('productTable', this.value)"></div>
+  </div>
+  <div class="sgi-table-wrap">
+    <table class="sgi-table" id="productTable">
+      <thead><tr><th>Product</th><th>Code</th><th>Description</th><th>Steps</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-gear"></i></div><span class="item-name">Brass Ball Valve Assembly</span></div></td>
+          <td><span class="item-code">BF-100</span></td>
+          <td class="text-muted">Full assembly with packing</td>
+          <td>
+            <div class="process-steps">
+              <span class="process-step done"><i class="bi bi-check-circle-fill" style="font-size:10px"></i> Incoming</span>
+              <span class="process-arrow">→</span>
+              <span class="process-step done"><i class="bi bi-check-circle-fill" style="font-size:10px"></i> Turning</span>
+              <span class="process-arrow">→</span>
+              <span class="process-step active">Drilling</span>
+              <span class="process-arrow">→</span>
+              <span class="process-step">Finishing</span>
+              <span class="process-arrow">→</span>
+              <span class="process-step">QC</span>
+            </div>
+          </td>
+          <td><span class="sgi-badge sgi-badge-green">Active</span></td>
+          <td><div class="td-actions"><button class="btn btn-sm btn-outline" onclick="showToast('Viewing BF-100','info')"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline"><i class="bi bi-pencil"></i></button></div></td>
+        </tr>
+        <tr>
+          <td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-gear"></i></div><span class="item-name">SS Stop Cock 15mm</span></div></td>
+          <td><span class="item-code">SS-200</span></td>
+          <td class="text-muted">Chrome plated, ISI mark</td>
+          <td>
+            <div class="process-steps">
+              <span class="process-step done"><i class="bi bi-check-circle-fill" style="font-size:10px"></i> Incoming</span>
+              <span class="process-arrow">→</span>
+              <span class="process-step done"><i class="bi bi-check-circle-fill" style="font-size:10px"></i> Turning</span>
+              <span class="process-arrow">→</span>
+              <span class="process-step done"><i class="bi bi-check-circle-fill" style="font-size:10px"></i> Drilling</span>
+              <span class="process-arrow">→</span>
+              <span class="process-step active">Finishing</span>
+              <span class="process-arrow">→</span>
+              <span class="process-step">QC</span>
+            </div>
+          </td>
+          <td><span class="sgi-badge sgi-badge-green">Active</span></td>
+          <td><div class="td-actions"><button class="btn btn-sm btn-outline"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline"><i class="bi bi-pencil"></i></button></div></td>
+        </tr>
+        <tr>
+          <td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-gear"></i></div><span class="item-name">MS Gate Valve 25mm</span></div></td>
+          <td><span class="item-code">MS-050</span></td>
+          <td class="text-muted">Heavy duty, flanged</td>
+          <td>
+            <div class="process-steps">
+              <span class="process-step done"><i class="bi bi-check-circle-fill" style="font-size:10px"></i> Incoming</span>
+              <span class="process-arrow">→</span>
+              <span class="process-step active">Turning</span>
+              <span class="process-arrow">→</span>
+              <span class="process-step">Drilling</span>
+              <span class="process-arrow">→</span>
+              <span class="process-step">Finishing</span>
+              <span class="process-arrow">→</span>
+              <span class="process-step">QC</span>
+            </div>
+          </td>
+          <td><span class="sgi-badge sgi-badge-green">Active</span></td>
+          <td><div class="td-actions"><button class="btn btn-sm btn-outline"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline"><i class="bi bi-pencil"></i></button></div></td>
+        </tr>
+        <tr>
+          <td><div class="d-flex align-center gap-8"><div class="item-img"><i class="bi bi-gear"></i></div><span class="item-name">CP Concealed Cock</span></div></td>
+          <td><span class="item-code">CP-300</span></td>
+          <td class="text-muted">1/2" wall mount, CP finish</td>
+          <td>
+            <div class="process-steps">
+              <span class="process-step active">Incoming</span>
+              <span class="process-arrow">→</span>
+              <span class="process-step">Turning</span>
+              <span class="process-arrow">→</span>
+              <span class="process-step">Drilling</span>
+              <span class="process-arrow">→</span>
+              <span class="process-step">Finishing</span>
+              <span class="process-arrow">→</span>
+              <span class="process-step">QC</span>
+            </div>
+          </td>
+          <td><span class="sgi-badge sgi-badge-green">Active</span></td>
+          <td><div class="td-actions"><button class="btn btn-sm btn-outline"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline"><i class="bi bi-pencil"></i></button></div></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ PAGE: PLANNING ============ -->
+<section class="sgi-page" id="page-planning">
+  <div class="sgi-page-header">
+    <div><div class="sgi-page-title">Planning</div><div class="sgi-page-subtitle">Production orders and planning cards</div></div>
+    <div class="sgi-page-actions">
+      <button class="btn btn-primary" onclick="openModal('addPlanModal')"><i class="bi bi-plus-lg"></i> New Plan</button>
+    </div>
+  </div>
+  <div class="sgi-filter-bar">
+    <div class="sgi-search-wrap"><i class="bi bi-search"></i><input class="sgi-search-input" placeholder="Search plans..."></div>
+    <select class="sgi-filter-select">
+      <option>All Status</option><option>Active</option><option>In Progress</option><option>Completed</option>
+    </select>
+  </div>
+  <div class="sgi-plan-grid">
+    <!-- Plan Card 1 -->
+    <div class="sgi-plan-card">
+      <div class="sgi-plan-card-header">
+        <div>
+          <div class="fw-700" style="font-size:15px">Order #2026-001</div>
+          <div class="text-muted text-sm">Created: 20 Nov 2026</div>
+        </div>
+        <div class="d-flex align-center gap-8">
+          <span class="sgi-badge sgi-badge-green">Active</span>
+          <span class="sgi-tag"><i class="bi bi-geo-alt-fill"></i> Jaipur</span>
+        </div>
+      </div>
+      <div class="sgi-plan-card-body">
+        <div class="text-muted text-sm mb-16" style="margin-bottom:10px">Products required:</div>
+        <div class="sgi-step-chips">
+          <span class="sgi-step-chip active">50× BF-100</span>
+          <span class="sgi-step-chip active">30× SS-200</span>
+        </div>
+        <div class="text-muted text-sm" style="margin-top:10px; margin-bottom:6px">Process steps:</div>
+        <div class="sgi-step-chips">
+          <span class="sgi-step-chip" style="background:rgba(46,125,50,0.1);border-color:var(--sgi-success);color:var(--sgi-success)">✓ Incoming</span>
+          <span class="sgi-step-chip" style="background:rgba(46,125,50,0.1);border-color:var(--sgi-success);color:var(--sgi-success)">✓ Turning</span>
+          <span class="sgi-step-chip active">Drilling</span>
+          <span class="sgi-step-chip">Finishing</span>
+          <span class="sgi-step-chip">QC</span>
+        </div>
+        <div style="margin-top:12px">
+          <div class="d-flex justify-between text-sm text-muted mb-16" style="margin-bottom:6px">
+            <span>Progress</span><span>65%</span>
+          </div>
+          <div class="sgi-progress"><div class="sgi-progress-bar" style="width:65%"></div></div>
+        </div>
+      </div>
+      <div class="sgi-plan-card-footer">
+        <div class="d-flex align-center gap-8">
+          <div class="sgi-assignee-avatar" style="width:24px;height:24px;font-size:10px">PK</div>
+          <span class="text-sm text-muted">Pravin K</span>
+        </div>
+        <div class="d-flex gap-8">
+          <button class="btn btn-sm btn-outline" onclick="showToast('Viewing plan details','info')"><i class="bi bi-eye"></i></button>
+          <button class="btn btn-sm btn-primary" onclick="showToast('Plan updated!','success')"><i class="bi bi-pencil"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plan Card 2 -->
+    <div class="sgi-plan-card">
+      <div class="sgi-plan-card-header">
+        <div>
+          <div class="fw-700" style="font-size:15px">Order #2026-002</div>
+          <div class="text-muted text-sm">Created: 24 Nov 2026</div>
+        </div>
+        <div class="d-flex align-center gap-8">
+          <span class="sgi-badge sgi-badge-orange">In Progress</span>
+          <span class="sgi-tag"><i class="bi bi-geo-alt-fill"></i> Mumbai</span>
+        </div>
+      </div>
+      <div class="sgi-plan-card-body">
+        <div class="text-muted text-sm mb-16" style="margin-bottom:10px">Products required:</div>
+        <div class="sgi-step-chips">
+          <span class="sgi-step-chip active">25× MS-050</span>
+        </div>
+        <div class="text-muted text-sm" style="margin-top:10px; margin-bottom:6px">Process steps:</div>
+        <div class="sgi-step-chips">
+          <span class="sgi-step-chip" style="background:rgba(46,125,50,0.1);border-color:var(--sgi-success);color:var(--sgi-success)">✓ Incoming</span>
+          <span class="sgi-step-chip active">Turning</span>
+          <span class="sgi-step-chip">Drilling</span>
+          <span class="sgi-step-chip">Finishing</span>
+          <span class="sgi-step-chip">QC</span>
+        </div>
+        <div style="margin-top:12px">
+          <div class="d-flex justify-between text-sm text-muted mb-16" style="margin-bottom:6px">
+            <span>Progress</span><span>30%</span>
+          </div>
+          <div class="sgi-progress"><div class="sgi-progress-bar blue" style="width:30%"></div></div>
+        </div>
+      </div>
+      <div class="sgi-plan-card-footer">
+        <div class="d-flex align-center gap-8">
+          <div class="sgi-assignee-avatar" style="width:24px;height:24px;font-size:10px;background:#01579B">KD</div>
+          <span class="text-sm text-muted">Ketan D</span>
+        </div>
+        <div class="d-flex gap-8">
+          <button class="btn btn-sm btn-outline" onclick="showToast('Viewing plan details','info')"><i class="bi bi-eye"></i></button>
+          <button class="btn btn-sm btn-primary" onclick="showToast('Plan updated!','success')"><i class="bi bi-pencil"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plan Card 3 -->
+    <div class="sgi-plan-card">
+      <div class="sgi-plan-card-header">
+        <div>
+          <div class="fw-700" style="font-size:15px">Order #2026-003</div>
+          <div class="text-muted text-sm">Created: 10 Nov 2026</div>
+        </div>
+        <div class="d-flex align-center gap-8">
+          <span class="sgi-badge sgi-badge-grey">Completed</span>
+          <span class="sgi-tag"><i class="bi bi-geo-alt-fill"></i> Ahmedabad</span>
+        </div>
+      </div>
+      <div class="sgi-plan-card-body">
+        <div class="text-muted text-sm mb-16" style="margin-bottom:10px">Products required:</div>
+        <div class="sgi-step-chips">
+          <span class="sgi-step-chip active">40× CP-300</span>
+          <span class="sgi-step-chip active">20× BF-100</span>
+        </div>
+        <div class="text-muted text-sm" style="margin-top:10px; margin-bottom:6px">Process steps:</div>
+        <div class="sgi-step-chips">
+          <span class="sgi-step-chip" style="background:rgba(46,125,50,0.1);border-color:var(--sgi-success);color:var(--sgi-success)">✓ Incoming</span>
+          <span class="sgi-step-chip" style="background:rgba(46,125,50,0.1);border-color:var(--sgi-success);color:var(--sgi-success)">✓ Turning</span>
+          <span class="sgi-step-chip" style="background:rgba(46,125,50,0.1);border-color:var(--sgi-success);color:var(--sgi-success)">✓ Drilling</span>
+          <span class="sgi-step-chip" style="background:rgba(46,125,50,0.1);border-color:var(--sgi-success);color:var(--sgi-success)">✓ Finishing</span>
+          <span class="sgi-step-chip" style="background:rgba(46,125,50,0.1);border-color:var(--sgi-success);color:var(--sgi-success)">✓ QC</span>
+        </div>
+        <div style="margin-top:12px">
+          <div class="d-flex justify-between text-sm text-muted mb-16" style="margin-bottom:6px">
+            <span>Progress</span><span>100%</span>
+          </div>
+          <div class="sgi-progress"><div class="sgi-progress-bar green" style="width:100%"></div></div>
+        </div>
+      </div>
+      <div class="sgi-plan-card-footer">
+        <div class="d-flex align-center gap-8">
+          <div class="sgi-assignee-avatar" style="width:24px;height:24px;font-size:10px;background:#2E7D32">JP</div>
+          <span class="text-sm text-muted">Jayesh P</span>
+        </div>
+        <div class="d-flex gap-8">
+          <button class="btn btn-sm btn-outline" onclick="showToast('Viewing plan details','info')"><i class="bi bi-eye"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PAGE: DISPATCH ============ -->
+<section class="sgi-page" id="page-dispatch">
+  <div class="sgi-page-header">
+    <div><div class="sgi-page-title">Dispatch</div><div class="sgi-page-subtitle">3 dispatches this month</div></div>
+    <div class="sgi-page-actions">
+      <button class="btn btn-primary" onclick="openModal('addDispatchModal')"><i class="bi bi-plus-lg"></i> New Dispatch</button>
+      <button class="btn btn-outline btn-sm" onclick="exportDemo()"><i class="bi bi-download"></i> Export</button>
+    </div>
+  </div>
+  <div class="sgi-filter-bar">
+    <div class="sgi-search-wrap"><i class="bi bi-search"></i><input class="sgi-search-input" placeholder="Search dispatches..." oninput="filterTable('dispatchTable', this.value)"></div>
+    <input type="date" class="sgi-filter-select" value="2026-11-27">
+  </div>
+  <div class="sgi-table-wrap">
+    <table class="sgi-table" id="dispatchTable">
+      <thead><tr><th>Dispatch #</th><th>Customer</th><th>Items</th><th>Total Qty</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="fw-600">DSP-2026-001</td>
+          <td>
+            <div class="fw-600">Jaipur Hardware House</div>
+            <div class="text-muted text-sm">Jaipur, Rajasthan</div>
+          </td>
+          <td><span class="sgi-badge sgi-badge-orange">BF-100 × 50</span></td>
+          <td class="qty-cell">50</td>
+          <td class="text-muted">27 Nov 2026</td>
+          <td><span class="sgi-badge sgi-badge-green">Dispatched</span></td>
+          <td><div class="td-actions"><button class="btn btn-sm btn-outline" onclick="showToast('Viewing dispatch details','info')"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline" onclick="exportDemo()"><i class="bi bi-printer"></i></button></div></td>
+        </tr>
+        <tr>
+          <td class="fw-600">DSP-2026-002</td>
+          <td>
+            <div class="fw-600">Ahmedabad Traders</div>
+            <div class="text-muted text-sm">Ahmedabad, Gujarat</div>
+          </td>
+          <td>
+            <span class="sgi-badge sgi-badge-blue">SS-200 × 80</span>
+            <span class="sgi-badge sgi-badge-orange" style="margin-left:4px">BF-100 × 40</span>
+          </td>
+          <td class="qty-cell">120</td>
+          <td class="text-muted">20 Nov 2026</td>
+          <td><span class="sgi-badge sgi-badge-green">Dispatched</span></td>
+          <td><div class="td-actions"><button class="btn btn-sm btn-outline"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline" onclick="exportDemo()"><i class="bi bi-printer"></i></button></div></td>
+        </tr>
+        <tr>
+          <td class="fw-600">DSP-2026-003</td>
+          <td>
+            <div class="fw-600">Mumbai Steel Works</div>
+            <div class="text-muted text-sm">Mumbai, Maharashtra</div>
+          </td>
+          <td><span class="sgi-badge sgi-badge-purple">MS-050 × 75</span></td>
+          <td class="qty-cell">75</td>
+          <td class="text-muted">18 Nov 2026</td>
+          <td><span class="sgi-badge sgi-badge-grey">Pending</span></td>
+          <td><div class="td-actions"><button class="btn btn-sm btn-outline"><i class="bi bi-eye"></i></button><button class="btn btn-sm btn-outline" onclick="showToast('Dispatch marked as sent!','success')"><i class="bi bi-check-lg"></i></button></div></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ PAGE: SETTINGS ============ -->
+<section class="sgi-page" id="page-settings">
+  <div class="sgi-page-header">
+    <div><div class="sgi-page-title">Settings</div><div class="sgi-page-subtitle">Manage your account and application settings</div></div>
+  </div>
+  <div class="sgi-settings-layout">
+    <div class="sgi-settings-nav">
+      <div class="sgi-settings-nav-item active" onclick="switchSettingsTab('profile')"><i class="bi bi-person"></i> Profile</div>
+      <div class="sgi-settings-nav-item" onclick="switchSettingsTab('company')"><i class="bi bi-building"></i> Company</div>
+      <div class="sgi-settings-nav-item" onclick="switchSettingsTab('users')"><i class="bi bi-people"></i> Users</div>
+      <div class="sgi-settings-nav-item" onclick="switchSettingsTab('processes')"><i class="bi bi-diagram-3"></i> Processes</div>
+      <div class="sgi-settings-nav-item" onclick="switchSettingsTab('security')"><i class="bi bi-shield-check"></i> Security</div>
+    </div>
+    <div class="sgi-settings-content">
+      <div id="settings-profile" class="sgi-card">
+        <div class="sgi-card-header"><div class="sgi-card-title">Profile Settings</div></div>
+        <div class="sgi-card-body">
+          <div class="d-flex align-center gap-12 mb-16" style="margin-bottom:20px;padding:16px;background:var(--sgi-bg);border-radius:8px">
+            <div class="sgi-avatar" style="width:56px;height:56px;font-size:18px;cursor:default">PK</div>
+            <div>
+              <div class="fw-600" style="font-size:16px">Pravin Kumar</div>
+              <div class="text-muted text-sm">pravin@sgi.com</div>
+              <button class="btn btn-sm btn-outline" style="margin-top:8px" onclick="showToast('Photo upload coming soon!','info')"><i class="bi bi-camera"></i> Change Photo</button>
+            </div>
+          </div>
+          <div class="sgi-form-grid">
+            <div class="sgi-form-group"><label class="sgi-form-label">First Name</label><input class="sgi-form-control" value="Pravin"></div>
+            <div class="sgi-form-group"><label class="sgi-form-label">Last Name</label><input class="sgi-form-control" value="Kumar"></div>
+            <div class="sgi-form-group"><label class="sgi-form-label">Email</label><input class="sgi-form-control" value="pravin@sgi.com" type="email"></div>
+            <div class="sgi-form-group"><label class="sgi-form-label">Phone</label><input class="sgi-form-control" value="+91 98765 43210"></div>
+          </div>
+          <div class="sgi-form-actions"><button class="btn btn-primary" onclick="showToast('Profile saved!','success')"><i class="bi bi-check-lg"></i> Save Changes</button></div>
+        </div>
+      </div>
+      <div id="settings-company" class="sgi-card" style="display:none">
+        <div class="sgi-card-header"><div class="sgi-card-title">Company Settings</div></div>
+        <div class="sgi-card-body">
+          <div class="sgi-form-grid">
+            <div class="sgi-form-group"><label class="sgi-form-label">Company Name</label><input class="sgi-form-control" value="Shree Gayatri Industries"></div>
+            <div class="sgi-form-group"><label class="sgi-form-label">GST Number</label><input class="sgi-form-control" value="24AABCS1429B1Z1"></div>
+            <div class="sgi-form-group"><label class="sgi-form-label">City</label><input class="sgi-form-control" value="Rajkot"></div>
+            <div class="sgi-form-group"><label class="sgi-form-label">State</label><input class="sgi-form-control" value="Gujarat"></div>
+            <div class="sgi-form-group" style="grid-column:1/-1"><label class="sgi-form-label">Address</label><textarea class="sgi-form-control">Plot No. 42, Industrial Area, Phase-2, Rajkot - 360001, Gujarat</textarea></div>
+          </div>
+          <div class="sgi-form-actions"><button class="btn btn-primary" onclick="showToast('Company info saved!','success')"><i class="bi bi-check-lg"></i> Save Changes</button></div>
+        </div>
+      </div>
+      <div id="settings-users" class="sgi-card" style="display:none">
+        <div class="sgi-card-header"><div class="sgi-card-title">User Management</div><button class="btn btn-primary btn-sm" onclick="showToast('Invite sent!','success')"><i class="bi bi-person-plus"></i> Invite User</button></div>
+        <div class="sgi-card-body" style="padding:0">
+          <table class="sgi-table">
+            <thead><tr><th>User</th><th>Role</th><th>Last Login</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><div class="d-flex align-center gap-8"><div class="sgi-assignee-avatar">PK</div><div><div class="fw-600">Pravin Kumar</div><div class="text-muted text-sm">pravin@sgi.com</div></div></div></td><td><span class="sgi-badge sgi-badge-orange">Admin</span></td><td class="text-muted">27 Nov 09:14</td><td><span class="sgi-badge sgi-badge-green">Active</span></td></tr>
+              <tr><td><div class="d-flex align-center gap-8"><div class="sgi-assignee-avatar" style="background:#01579B">KD</div><div><div class="fw-600">Ketan Desai</div><div class="text-muted text-sm">ketan@sgi.com</div></div></div></td><td><span class="sgi-badge sgi-badge-blue">Staff</span></td><td class="text-muted">27 Nov 08:45</td><td><span class="sgi-badge sgi-badge-green">Active</span></td></tr>
+              <tr><td><div class="d-flex align-center gap-8"><div class="sgi-assignee-avatar" style="background:#2E7D32">JP</div><div><div class="fw-600">Jayesh Patel</div><div class="text-muted text-sm">jayesh@sgi.com</div></div></div></td><td><span class="sgi-badge sgi-badge-blue">Staff</span></td><td class="text-muted">26 Nov 17:00</td><td><span class="sgi-badge sgi-badge-green">Active</span></td></tr>
+              <tr><td><div class="d-flex align-center gap-8"><div class="sgi-assignee-avatar" style="background:#C62828">RS</div><div><div class="fw-600">Ramesh Shah</div><div class="text-muted text-sm">ramesh@sgi.com</div></div></div></td><td><span class="sgi-badge sgi-badge-blue">Staff</span></td><td class="text-muted">26 Nov 16:00</td><td><span class="sgi-badge sgi-badge-green">Active</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div id="settings-processes" class="sgi-card" style="display:none">
+        <div class="sgi-card-header"><div class="sgi-card-title">Process Configuration</div></div>
+        <div class="sgi-card-body">
+          <div class="text-muted text-sm mb-16" style="margin-bottom:16px">Drag to reorder production processes:</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--sgi-bg);border:1px solid var(--sgi-border);border-radius:6px"><i class="bi bi-grip-vertical text-muted"></i><span class="fw-600">1.</span><span>Incoming</span><span class="sgi-badge sgi-badge-orange" style="margin-left:auto">First Step</span></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--sgi-bg);border:1px solid var(--sgi-border);border-radius:6px"><i class="bi bi-grip-vertical text-muted"></i><span class="fw-600">2.</span><span>Turning</span></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--sgi-bg);border:1px solid var(--sgi-border);border-radius:6px"><i class="bi bi-grip-vertical text-muted"></i><span class="fw-600">3.</span><span>Drilling</span></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--sgi-bg);border:1px solid var(--sgi-border);border-radius:6px"><i class="bi bi-grip-vertical text-muted"></i><span class="fw-600">4.</span><span>Finishing</span></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--sgi-bg);border:1px solid var(--sgi-border);border-radius:6px"><i class="bi bi-grip-vertical text-muted"></i><span class="fw-600">5.</span><span>QC</span><span class="sgi-badge sgi-badge-grey" style="margin-left:auto">Last Step</span></div>
+          </div>
+          <div class="sgi-form-actions"><button class="btn btn-primary" onclick="showToast('Process order saved!','success')"><i class="bi bi-check-lg"></i> Save Order</button></div>
+        </div>
+      </div>
+      <div id="settings-security" class="sgi-card" style="display:none">
+        <div class="sgi-card-header"><div class="sgi-card-title">Security</div></div>
+        <div class="sgi-card-body">
+          <div class="sgi-form-grid">
+            <div class="sgi-form-group"><label class="sgi-form-label">Current Password</label><input type="password" class="sgi-form-control" placeholder="Enter current password"></div>
+            <div style="display:block"></div>
+            <div class="sgi-form-group"><label class="sgi-form-label">New Password</label><input type="password" class="sgi-form-control" placeholder="Min 8 characters"></div>
+            <div class="sgi-form-group"><label class="sgi-form-label">Confirm Password</label><input type="password" class="sgi-form-control" placeholder="Repeat new password"></div>
+          </div>
+          <div class="sgi-form-actions"><button class="btn btn-primary" onclick="showToast('Password changed!','success')"><i class="bi bi-shield-check"></i> Change Password</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ===================== MODALS ===================== -->
+
+<!-- Add Item Modal -->
+<div class="sgi-modal-overlay" id="addItemModal" style="display:none" onclick="closeModalOutside(event,'addItemModal')">
+  <div class="sgi-modal">
+    <div class="sgi-modal-header">
+      <div class="sgi-modal-title"><i class="bi bi-plus-circle" style="color:var(--sgi-primary)"></i> Add New Item</div>
+      <button class="sgi-modal-close" onclick="closeModal('addItemModal')"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="sgi-modal-body">
+      <div class="sgi-form-grid">
+        <div class="sgi-form-group"><label class="sgi-form-label">Item Name <span>*</span></label><input class="sgi-form-control" placeholder="e.g. Brass Fitting 20mm" required></div>
+        <div class="sgi-form-group"><label class="sgi-form-label">Item Code <span>*</span></label><input class="sgi-form-control" placeholder="e.g. ITM009"></div>
+        <div class="sgi-form-group"><label class="sgi-form-label">Category</label><select class="sgi-form-control"><option>Fittings</option><option>Pipes</option><option>Valves</option><option>Hardware</option></select></div>
+        <div class="sgi-form-group"><label class="sgi-form-label">Unit</label><select class="sgi-form-control"><option>pcs</option><option>kg</option><option>meters</option><option>sets</option></select></div>
+        <div class="sgi-form-group" style="grid-column:1/-1"><label class="sgi-form-label">Description</label><textarea class="sgi-form-control" placeholder="Optional item description..."></textarea></div>
+      </div>
+    </div>
+    <div class="sgi-modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('addItemModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="handleModalSubmit('addItemModal','Item added to catalog!')"><i class="bi bi-check-lg"></i> Add Item</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Plan Modal -->
+<div class="sgi-modal-overlay" id="addPlanModal" style="display:none" onclick="closeModalOutside(event,'addPlanModal')">
+  <div class="sgi-modal">
+    <div class="sgi-modal-header">
+      <div class="sgi-modal-title"><i class="bi bi-kanban" style="color:var(--sgi-primary)"></i> New Production Plan</div>
+      <button class="sgi-modal-close" onclick="closeModal('addPlanModal')"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="sgi-modal-body">
+      <div class="sgi-form-grid">
+        <div class="sgi-form-group"><label class="sgi-form-label">Order / Plan Name <span>*</span></label><input class="sgi-form-control" placeholder="e.g. Order #2026-004"></div>
+        <div class="sgi-form-group"><label class="sgi-form-label">Customer / Tag</label><input class="sgi-form-control" placeholder="e.g. Jaipur, Mumbai..."></div>
+        <div class="sgi-form-group"><label class="sgi-form-label">Product <span>*</span></label><select class="sgi-form-control"><option value="">Select Product...</option><option>BF-100 - Brass Ball Valve</option><option>SS-200 - SS Stop Cock</option><option>MS-050 - MS Gate Valve</option><option>CP-300 - CP Concealed Cock</option></select></div>
+        <div class="sgi-form-group"><label class="sgi-form-label">Quantity <span>*</span></label><input type="number" class="sgi-form-control" placeholder="Number of units" min="1"></div>
+        <div class="sgi-form-group"><label class="sgi-form-label">Target Date</label><input type="date" class="sgi-form-control"></div>
+        <div class="sgi-form-group"><label class="sgi-form-label">Assigned To</label><select class="sgi-form-control"><option>Pravin Kumar</option><option>Ketan D</option><option>Jayesh P</option></select></div>
+        <div class="sgi-form-group" style="grid-column:1/-1"><label class="sgi-form-label">Notes</label><textarea class="sgi-form-control" placeholder="Production notes..."></textarea></div>
+      </div>
+    </div>
+    <div class="sgi-modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('addPlanModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="handleModalSubmit('addPlanModal','Plan created successfully!')"><i class="bi bi-check-lg"></i> Create Plan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Dispatch Modal -->
+<div class="sgi-modal-overlay" id="addDispatchModal" style="display:none" onclick="closeModalOutside(event,'addDispatchModal')">
+  <div class="sgi-modal">
+    <div class="sgi-modal-header">
+      <div class="sgi-modal-title"><i class="bi bi-truck" style="color:var(--sgi-primary)"></i> New Dispatch</div>
+      <button class="sgi-modal-close" onclick="closeModal('addDispatchModal')"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="sgi-modal-body">
+      <div class="sgi-form-grid">
+        <div class="sgi-form-group"><label class="sgi-form-label">Customer Name <span>*</span></label><input class="sgi-form-control" placeholder="e.g. Delhi Hardware House"></div>
+        <div class="sgi-form-group"><label class="sgi-form-label">City / Location</label><input class="sgi-form-control" placeholder="e.g. Delhi"></div>
+        <div class="sgi-form-group"><label class="sgi-form-label">Product <span>*</span></label><select class="sgi-form-control"><option value="">Select Product...</option><option>BF-100 - Brass Ball Valve</option><option>SS-200 - SS Stop Cock</option><option>MS-050 - MS Gate Valve</option><option>CP-300 - CP Concealed Cock</option></select></div>
+        <div class="sgi-form-group"><label class="sgi-form-label">Quantity <span>*</span></label><input type="number" class="sgi-form-control" placeholder="Units to dispatch" min="1"></div>
+        <div class="sgi-form-group"><label class="sgi-form-label">Dispatch Date</label><input type="date" class="sgi-form-control" value="2026-11-27"></div>
+        <div class="sgi-form-group"><label class="sgi-form-label">Vehicle / LR No.</label><input class="sgi-form-control" placeholder="e.g. GJ-03-AB-1234"></div>
+        <div class="sgi-form-group" style="grid-column:1/-1"><label class="sgi-form-label">Notes</label><textarea class="sgi-form-control" placeholder="Dispatch notes..."></textarea></div>
+      </div>
+    </div>
+    <div class="sgi-modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('addDispatchModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="handleModalSubmit('addDispatchModal','Dispatch created!')"><i class="bi bi-check-lg"></i> Create Dispatch</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Product Modal -->
+<div class="sgi-modal-overlay" id="addProductModal" style="display:none" onclick="closeModalOutside(event,'addProductModal')">
+  <div class="sgi-modal">
+    <div class="sgi-modal-header">
+      <div class="sgi-modal-title"><i class="bi bi-gear" style="color:var(--sgi-primary)"></i> Add New Product</div>
+      <button class="sgi-modal-close" onclick="closeModal('addProductModal')"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="sgi-modal-body">
+      <div class="sgi-form-grid">
+        <div class="sgi-form-group"><label class="sgi-form-label">Product Name <span>*</span></label><input class="sgi-form-control" placeholder="e.g. Brass Angle Valve"></div>
+        <div class="sgi-form-group"><label class="sgi-form-label">Product Code <span>*</span></label><input class="sgi-form-control" placeholder="e.g. AV-400"></div>
+        <div class="sgi-form-group" style="grid-column:1/-1"><label class="sgi-form-label">Description</label><textarea class="sgi-form-control" placeholder="Product description..."></textarea></div>
+        <div class="sgi-form-group" style="grid-column:1/-1">
+          <label class="sgi-form-label">Production Steps</label>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;padding:12px;border:1.5px solid var(--sgi-border);border-radius:6px">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" checked> Incoming</label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" checked> Turning</label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox"> Drilling</label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox"> Finishing</label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox"> QC</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sgi-modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('addProductModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="handleModalSubmit('addProductModal','Product added!')"><i class="bi bi-check-lg"></i> Add Product</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== JS ===================== -->
+<script>
+// ---- PAGE NAVIGATION ----
+const pageNames = {
+  'dashboard': 'Dashboard',
+  'catalog': 'Item Catalog',
+  'inventory': 'Inventory',
+  'add-stock': 'Add Stock',
+  'move-stock': 'Move Stock',
+  'history': 'Stock History',
+  'completed': 'Completed Stock',
+  'by-process': 'Stock by Process',
+  'by-assignee': 'Stock by Assignee',
+  'products': 'Products',
+  'planning': 'Planning',
+  'dispatch': 'Dispatch',
+  'settings': 'Settings'
+};
+
+function showPage(id) {
+  document.querySelectorAll('.sgi-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sgi-nav-item').forEach(n => n.classList.remove('active'));
+  const page = document.getElementById('page-' + id);
+  if (page) page.classList.add('active');
+  const nav = document.getElementById('nav-' + id);
+  if (nav) nav.classList.add('active');
+  document.getElementById('breadcrumbCurrent').textContent = pageNames[id] || id;
+  window.scrollTo(0, 0);
+  closeUserDropdown();
+}
+
+// ---- SIDEBAR TOGGLE ----
+let sidebarCollapsed = false;
+function toggleSidebar() {
+  sidebarCollapsed = !sidebarCollapsed;
+  const sb = document.getElementById('sidebar');
+  const tb = document.getElementById('topbar');
+  const mc = document.getElementById('mainContent');
+  if (sidebarCollapsed) {
+    sb.classList.add('collapsed');
+    tb.classList.add('sidebar-collapsed');
+    mc.classList.add('sidebar-collapsed');
+  } else {
+    sb.classList.remove('collapsed');
+    tb.classList.remove('sidebar-collapsed');
+    mc.classList.remove('sidebar-collapsed');
+  }
+}
+
+// ---- USER DROPDOWN ----
+function toggleUserDropdown() {
+  document.getElementById('userDropdown').classList.toggle('show');
+}
+function closeUserDropdown() {
+  document.getElementById('userDropdown').classList.remove('show');
+}
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('#userAvatarBtn') && !e.target.closest('#userDropdown')) {
+    closeUserDropdown();
+  }
+});
+
+// ---- TOAST ----
+function showToast(msg, type = 'success') {
+  const icons = { success: 'bi-check-circle-fill', error: 'bi-x-circle-fill', info: 'bi-info-circle-fill' };
+  const toast = document.createElement('div');
+  toast.className = 'sgi-toast ' + type;
+  toast.innerHTML = '<i class="bi ' + icons[type] + '"></i><span>' + msg + '</span>';
+  const container = document.getElementById('toastContainer');
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(30px)'; toast.style.transition = 'all 0.3s'; setTimeout(() => toast.remove(), 300); }, 2800);
+}
+
+// ---- FORM HANDLERS ----
+function handleAddStock(e) {
+  e.preventDefault();
+  showToast('Stock added successfully!', 'success');
+  setTimeout(() => showPage('inventory'), 800);
+}
+function handleMoveStock(e) {
+  e.preventDefault();
+  showToast('Stock moved successfully!', 'success');
+  setTimeout(() => showPage('inventory'), 800);
+}
+
+// ---- TABLE FILTER ----
+function filterTable(tableId, query) {
+  const table = document.getElementById(tableId);
+  if (!table) return;
+  const rows = table.querySelectorAll('tbody tr');
+  const q = query.toLowerCase();
+  rows.forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+function filterTableBySelect(tableId, value, colIndex) {
+  const table = document.getElementById(tableId);
+  if (!table) return;
+  const rows = table.querySelectorAll('tbody tr');
+  rows.forEach(row => {
+    const cell = row.cells[colIndex];
+    if (!value || (cell && cell.textContent.trim() === value)) {
+      row.style.display = '';
+    } else {
+      row.style.display = 'none';
+    }
+  });
+}
+
+// ---- TABS ----
+function switchTab(tabsId, contentsId, activeTabId) {
+  const tabsEl = document.getElementById(tabsId);
+  const contentsEl = document.getElementById(contentsId);
+  if (!tabsEl || !contentsEl) return;
+  tabsEl.querySelectorAll('.sgi-tab').forEach((tab, i) => {
+    const contents = contentsEl.querySelectorAll('.sgi-tab-content');
+    if (tab === event.target) {
+      tab.classList.add('active');
+      contents[i] && contents[i].classList.add('active');
+    } else {
+      tab.classList.remove('active');
+      contents[i] && contents[i].classList.remove('active');
+    }
+  });
+}
+
+// ---- SETTINGS TABS ----
+function switchSettingsTab(tab) {
+  const tabs = ['profile','company','users','processes','security'];
+  tabs.forEach(t => {
+    const el = document.getElementById('settings-' + t);
+    if (el) el.style.display = t === tab ? 'block' : 'none';
+  });
+  document.querySelectorAll('.sgi-settings-nav-item').forEach((el, i) => {
+    el.classList.toggle('active', tabs[i] === tab);
+  });
+}
+
+// ---- MODALS ----
+function openModal(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = 'flex';
+}
+function closeModal(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = 'none';
+}
+function closeModalOutside(e, id) {
+  if (e.target.id === id) closeModal(id);
+}
+function handleModalSubmit(modalId, msg) {
+  closeModal(modalId);
+  showToast(msg, 'success');
+}
+
+// ---- EXPORT DEMO ----
+function exportDemo() {
+  showToast('PDF export is a frontend demo — no actual file generated.', 'info');
+}
+
+// Initial greeting toast
+setTimeout(() => showToast('Welcome to SGI ERP Demo! All data is sample data.', 'info'), 600);
+</script>
+</body>
+</html>
